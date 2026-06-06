@@ -43,7 +43,7 @@ export const LoginPage = () => {
         <div className={styles.authLogo}>
           <div className={styles.logoIcon}>⚡</div>
           <div>
-            <div className={styles.logoText}>DEVMASTERY</div>
+            <div className={styles.logoText}>REACTDEVMASTERY</div>
             <div className={styles.logoSub}>SENIOR FRONTEND ACADEMY</div>
           </div>
         </div>
@@ -139,7 +139,7 @@ export const RegisterPage = () => {
   const handleGoogle = async (credential) => {
     try {
       await googleLogin(credential);
-      toast.success('Welcome to DevMastery! 🚀');
+      toast.success('Welcome to ReactDevMastery! 🚀');
       navigate('/');
     } catch (err) {
       toast.error(err.response?.data?.message || 'Google sign-up failed');
@@ -158,7 +158,7 @@ export const RegisterPage = () => {
         <div className={styles.authLogo}>
           <div className={styles.logoIcon}>⚡</div>
           <div>
-            <div className={styles.logoText}>DEVMASTERY</div>
+            <div className={styles.logoText}>REACTDEVMASTERY</div>
             <div className={styles.logoSub}>SENIOR FRONTEND ACADEMY</div>
           </div>
         </div>

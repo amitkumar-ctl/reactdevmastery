@@ -12,6 +12,7 @@ import FlashCards from './pages/FlashCards';
 import Leaderboard from './pages/Leaderboard';
 import Profile from './pages/Profile';
 import InterviewPrepPage from './pages/InterviewPrepPage';
+import QuizPage from './pages/QuizPage';
 
 // ── Protected Route ────────────────────────────────────────────────────
 const PrivateRoute = ({ children }) => {
@@ -72,6 +73,7 @@ const App = () => (
           <Route path="/flashcards" element={<PrivateRoute><FlashCards /></PrivateRoute>} />
           <Route path="/leaderboard" element={<PrivateRoute><Leaderboard /></PrivateRoute>} />
           <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
+          <Route path="/quiz" element={<PrivateRoute><QuizPage /></PrivateRoute>} />
           <Route path="/:topicId" element={<PrivateRoute><TopicPage /></PrivateRoute>} />
           <Route path="/:topicId/:conceptId" element={<PrivateRoute><ConceptPage /></PrivateRoute>} />
 

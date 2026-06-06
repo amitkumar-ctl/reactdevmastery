@@ -128,9 +128,9 @@ export const ConceptPage = () => {
       </div>
 
       <div className={styles.tabBar}>
-        {['learn', 'quiz', 'challenge', 'chat'].map(t => (
+        {['learn', 'quiz', 'chat'].map(t => (
           <button key={t} className={`${styles.tabBtn} ${tab === t ? styles.tabActive : ''}`} onClick={() => setTab(t)}>
-            {t === 'learn' ? '📖 Learn' : t === 'quiz' ? '🎯 Quiz' : t === 'challenge' ? '⚡ Challenge' : '💬 Ask AI'}
+            {t === 'learn' ? '📖 Learn' : t === 'quiz' ? '🎯 Quiz' : '💬 Ask AI'}
           </button>
         ))}
       </div>
@@ -138,7 +138,7 @@ export const ConceptPage = () => {
       <div className={styles.content}>
         {tab === 'learn' && <LearnTab item={item} topicId={topicId} onRead={() => markConceptDone(item.id, topicId, allIds)} />}
         {tab === 'quiz' && <QuizTab item={item} topicId={topicId} onAnswer={recordQuiz} />}
-        {tab === 'challenge' && <ChallengeTab item={item} />}
+        {/* {tab === 'challenge' && <ChallengeTab item={item} />} */}
         {tab === 'chat' && <ChatTab item={item} />}
       </div>
     </div>

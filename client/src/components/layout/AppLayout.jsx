@@ -31,7 +31,7 @@ const AppLayout = ({ children }) => {
           <div className={styles.logo}>
             <div className={styles.logoIcon}>⚡</div>
             <div>
-              <div className={styles.logoText}>DEVMASTERY</div>
+              <div className={styles.logoText}>REACTDEVMASTERY</div>
               <div className={styles.logoSub}>SENIOR FRONTEND</div>
             </div>
           </div>

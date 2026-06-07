@@ -136,8 +136,8 @@ export const ConceptPage = () => {
       </div>
 
       <div className={styles.content}>
-        {tab === 'learn' && <LearnTab item={item} topicId={topicId} onRead={() => markConceptDone(item.id, topicId, allIds)} />}
-        {tab === 'quiz' && <QuizTab item={item} topicId={topicId} onAnswer={recordQuiz} />}
+        {tab === 'learn' && <LearnTab item={item} topicId={topicId} />}
+        {tab === 'quiz' && <QuizTab item={item} topicId={topicId} onAnswer={recordQuiz} onCorrect={() => markConceptDone(item.id, topicId, allIds)} />}
         {/* {tab === 'challenge' && <ChallengeTab item={item} />} */}
         {tab === 'chat' && <ChatTab item={item} />}
       </div>
@@ -146,15 +146,13 @@ export const ConceptPage = () => {
 };
 
 
-const LearnTab = ({ item, topicId, onRead }) => {
+const LearnTab = ({ item, topicId }) => {
   const VisComponent = VISUALIZERS[item.id];
   const LearnComponent = LEARN_COMPONENTS[item.id];
   const content = CONTENT[item.id];
   const [showAI, setShowAI] = useState(false);
   const [aiContent, setAiContent] = useState(null);
   const [loadingAI, setLoadingAI] = useState(false);
-
-  useEffect(() => { onRead?.(); }, [item.id]);
 
   const fetchAI = async () => {
     setLoadingAI(true);
@@ -228,12 +226,15 @@ const LearnTab = ({ item, topicId, onRead }) => {
 };
 
 // ── Quiz Tab ───────────────────────────────────────────────────────────
-const QuizTab = ({ item, topicId, onAnswer }) => {
+const QuizTab = ({ item, topicId, onAnswer, onCorrect }) => {
   const [quizzes, setQuizzes] = useState(QUIZZES[item.id] || []);
   const [idx, setIdx] = useState(0);
   const [answered, setAnswered] = useState(false);
   const [selected, setSelected] = useState(null);
   const [generatingAI, setGeneratingAI] = useState(false);
+  // track which indices answered and what was selected
+  const [answeredIndices, setAnsweredIndices] = useState(new Set());
+  const [selectedAnswers, setSelectedAnswers] = useState({}); // idx -> optIdx
 
   const q = quizzes[idx];
 
@@ -243,6 +244,25 @@ const QuizTab = ({ item, topicId, onAnswer }) => {
     setSelected(optIdx);
     const correct = optIdx === q.correct;
     onAnswer?.(item.id, topicId, correct);
+
+    // Record answer for this question
+    const newAnswered = new Set(answeredIndices);
+    newAnswered.add(idx);
+    setAnsweredIndices(newAnswered);
+    setSelectedAnswers(prev => ({ ...prev, [idx]: optIdx }));
+
+    // Mark concept complete when ALL questions have been answered
+    if (newAnswered.size === quizzes.length) {
+      onCorrect?.();
+    }
+  };
+
+  // Navigate to a question and restore its answered state if already done
+  const goTo = (newIdx) => {
+    setIdx(newIdx);
+    const wasDone = answeredIndices.has(newIdx);
+    setAnswered(wasDone);
+    setSelected(wasDone ? (selectedAnswers[newIdx] ?? null) : null);
   };
 
   const genAIQuiz = async () => {
@@ -290,17 +310,48 @@ const QuizTab = ({ item, topicId, onAnswer }) => {
             );
           })}
         </div>
+        {/* Prompt to answer if not yet answered */}
+        {!answered && (
+          <div style={{ marginTop: 12, fontSize: 12, color: '#4b5563', textAlign: 'center' }}>
+            ↑ Select an answer to continue
+          </div>
+        )}
+
         {answered && (
           <div className={`${styles.quizFeedback} ${selected === q.correct ? styles.feedbackPass : styles.feedbackFail}`}>
             {selected === q.correct ? '✓ Correct!' : '✗ Not quite.'}<br /><br />{q.explain}
           </div>
         )}
+
         <div className={styles.quizNav}>
-          <button className={styles.btn} onClick={() => { setIdx(Math.max(0, idx-1)); setAnswered(false); setSelected(null); }} disabled={idx === 0}>← Prev</button>
-          <button className={styles.btn} onClick={() => { setIdx(Math.min(quizzes.length-1, idx+1)); setAnswered(false); setSelected(null); }} disabled={idx === quizzes.length-1}>Next →</button>
-          <button className={styles.btn} onClick={genAIQuiz} disabled={generatingAI} style={{ marginLeft: 'auto' }}>
-            {generatingAI ? '⏳' : '+ AI Question'}
+          {/* Prev always allowed so user can review earlier questions */}
+          <button
+            className={styles.btn}
+            onClick={() => goTo(Math.max(0, idx - 1))}
+            disabled={idx === 0}
+          >
+            ← Prev
           </button>
+
+          {/* Next only enabled after current question is answered */}
+          {idx < quizzes.length - 1 && (
+            <button
+              className={styles.btn}
+              onClick={() => goTo(idx + 1)}
+              disabled={!answered}
+              title={!answered ? 'Answer this question first' : ''}
+              style={{ opacity: !answered ? 0.4 : 1, cursor: !answered ? 'not-allowed' : 'pointer' }}
+            >
+              Next →
+            </button>
+          )}
+
+          {/* Add AI question only on last question after answering */}
+          {idx === quizzes.length - 1 && answered && (
+            <button className={styles.btn} onClick={genAIQuiz} disabled={generatingAI} style={{ marginLeft: 'auto' }}>
+              {generatingAI ? '⏳' : '+ AI Question'}
+            </button>
+          )}
         </div>
       </div>
     </div>

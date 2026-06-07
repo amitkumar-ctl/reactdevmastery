@@ -1667,6 +1667,242 @@ export const QUIZZES = {
   { q: "Where should the access token from OAuth be stored in a SPA?", opts: ["localStorage — easy access", "In-memory JavaScript variable — not accessible to other tabs or XSS (nothing stored in DOM-accessible storage), lost on refresh (use refresh token in httpOnly cookie to silently re-issue)", "sessionStorage — cleared on tab close", "A cookie readable by JS"], correct: 1, explain: "Access token in memory: XSS attack has access to the current page's memory but only while the script runs — harder to exfiltrate than localStorage (persistent). On refresh, use refresh token (httpOnly cookie) to get new access token silently. Never localStorage — it persists and is readable by any XSS." },
   { q: "What is token binding and the token audience claim (aud) used for?", opts: ["Binding tokens to user profiles", "aud restricts which service can use the token — a token issued for api.example.com rejected by other.example.com. Prevents token forwarding attacks where stolen token is replayed against different services.", "Binding tokens to IP addresses", "The token's creation timestamp"], correct: 1, explain: "aud (audience) claim: JWT payload includes 'aud': 'https://api.myapp.com'. When api.myapp.com validates: checks aud matches its own identifier. If same token sent to other-service.myapp.com: aud mismatch → rejected. Prevents: attacker stealing token from API A and replaying it against API B which uses the same auth server." },
 ],
+
+  // ── JS Interview Round ──────────────────────────────────────────
+  'ji-var-let-const': [
+    { q: "What does this print?\nconsole.log(x);\nvar x = 5;", opts: ["5", "undefined", "ReferenceError", "null"], correct: 1, explain: "var is hoisted and initialized to undefined. Declaration moves up but assignment stays. console.log runs before x=5 is assigned — prints undefined." },
+    { q: "What does this print?\nconsole.log(y);\nlet y = 5;", opts: ["undefined", "5", "ReferenceError: Cannot access 'y' before initialization", "null"], correct: 2, explain: "let is hoisted but NOT initialized — it is in the Temporal Dead Zone. Accessing it before the declaration throws ReferenceError." },
+    { q: "What is the Temporal Dead Zone?", opts: ["A deleted variable", "The period between a let/const being hoisted and its declaration line — accessing throws ReferenceError", "A garbage collected variable", "A scope boundary"], correct: 1, explain: "let and const ARE hoisted but not initialized. From scope start until declaration, they are in the TDZ — inaccessible. This prevents the confusing undefined behavior of var." },
+    { q: "What is the difference between const and Object.freeze()?", opts: ["They are identical", "const prevents reassignment. Object.freeze() prevents property mutation. const obj = {} still allows obj.x = 1.", "const deep freezes", "freeze prevents reassignment"], correct: 1, explain: "const locks the binding — the variable cannot point to a different object. But the object is still mutable: obj.name = 'changed' works. Object.freeze(obj) makes properties read-only (shallow)." },
+    { q: "What does this print?\nfor (var i = 0; i < 3; i++) {\n  setTimeout(() => console.log(i), 0);\n}", opts: ["0, 1, 2", "3, 3, 3", "0, 0, 0", "undefined x3"], correct: 1, explain: "var is function-scoped — all callbacks close over the SAME i. By the time setTimeout fires, the loop is done and i is 3. Fix: use let (block-scoped, creates new i per iteration)." },
+  ],
+  'ji-closures': [
+    { q: "What is a closure?", opts: ["A function with no parameters", "A function that retains access to variables from its outer scope even after the outer function returned", "A private class method", "A self-invoking function"], correct: 1, explain: "A closure forms when an inner function references variables from an outer scope. The inner function keeps those variables alive even after the outer function finishes." },
+    { q: "What does this return?\nfunction makeAdder(x) {\n  return (y) => x + y;\n}\nconst add5 = makeAdder(5);\nadd5(3);", opts: ["undefined", "8", "5", "Error"], correct: 1, explain: "makeAdder(5) returns an arrow function closing over x=5. add5(3) executes with y=3, returning 5+3=8. Classic partial application via closure." },
+    { q: "Do closures hold a reference or a copy of outer variables?", opts: ["A copy at creation time", "A live reference — closure sees the CURRENT value, not what it was when created", "A frozen snapshot", "Depends on type"], correct: 1, explain: "Closures capture a LIVE REFERENCE. This is why the var loop prints 3,3,3: all closures share the same i reference and see its final value." },
+  ],
+  'ji-this': [
+    { q: "What are the four rules for 'this' binding?", opts: ["One rule: always the class", "Default (global/undefined in strict), Implicit (object.method()), Explicit (call/apply/bind), new (constructor)", "Arrow function rule only", "Lexical scope only"], correct: 1, explain: "1. Default: fn() standalone. 2. Implicit: obj.fn() binds obj. 3. Explicit: call/apply/bind. 4. new: creates new object. Arrow functions ignore all rules — lexical this from definition site." },
+    { q: "What does this print?\nconst obj = { x: 42, getX() { return this.x; } };\nconst fn = obj.getX;\nconsole.log(fn());", opts: ["42", "undefined", "TypeError", "null"], correct: 1, explain: "Extracting a method loses its binding. fn() is standalone — this is undefined (strict) or window (non-strict). window.x is undefined. The implicit obj binding is lost." },
+    { q: "const obj = { x: 10, getX: () => this.x };\nconsole.log(obj.getX()); — what prints?", opts: ["10", "undefined", "TypeError", "null"], correct: 1, explain: "Arrow function captures 'this' from where the object literal is DEFINED — the outer scope (global/module). The implicit obj binding is ignored. this.x in global scope is undefined." },
+  ],
+  'ji-prototype': [
+    { q: "What is the prototype chain?", opts: ["A CSS pattern", "A chain of objects linked via [[Prototype]] — property lookup walks up the chain until found or reaches null", "A design pattern", "An inheritance keyword"], correct: 1, explain: "Every object has [[Prototype]]. Property lookup: object → its prototype → prototype's prototype → Object.prototype → null. This is how toString() is available on every object." },
+    { q: "What does Object.create(proto) do?", opts: ["Copies all properties", "Creates a new object with proto as its [[Prototype]] — no constructor called", "Deep clones", "Creates a Proxy"], correct: 1, explain: "Object.create(proto): new object whose [[Prototype]] is set to proto. Inherits proto's properties via chain. Unlike new Constructor(), no constructor function is called." },
+    { q: "What does 'class' syntax do under the hood?", opts: ["Creates real classes", "Syntactic sugar over prototypal inheritance — same prototype chain mechanics, cleaner syntax", "Isolated objects", "Enables multiple inheritance"], correct: 1, explain: "class Animal { speak() {} } is essentially function Animal() {} plus Animal.prototype.speak = function() {}. extends sets up the prototype chain. Runtime behavior is identical to ES5 patterns." },
+  ],
+  'ji-promises': [
+    { q: "Promise.resolve(1).then(x=>x+1).then(x=>{throw new Error('oops')}).then(x=>x+1).catch(e=>e.message) — what resolves?", opts: ["2", "3", "'oops'", "Error"], correct: 2, explain: "1+1=2. Throw skips next .then (rejection propagates). .catch receives error, returns e.message = 'oops'. Chain resolves with 'oops'." },
+    { q: "What is the Promise constructor anti-pattern?", opts: ["Using async/await", "Wrapping an already-Promise function in new Promise() unnecessarily", "Using .catch()", "Chaining .then()"], correct: 1, explain: "new Promise((res,rej) => fetch('/api').then(res).catch(rej)) is pointless — just return fetch('/api'). Only use new Promise() when wrapping callback-based APIs like setTimeout." },
+    { q: "What is the difference between Promise.all and Promise.allSettled?", opts: ["Identical", "Promise.all rejects on first failure. Promise.allSettled waits for all, returns each outcome — never rejects.", "allSettled is faster", "Promise.all is deprecated"], correct: 1, explain: "Promise.all: fail-fast — one rejection = everything rejects. Promise.allSettled: waits for all, returns [{status:'fulfilled',value:...}, {status:'rejected',reason:...}]." },
+  ],
+  'ji-coercion': [
+    { q: "What does == do differently from ===?", opts: ["== is faster", "== performs type coercion before comparing. === compares type AND value with no coercion.", "=== checks prototypes", "Identical for numbers"], correct: 1, explain: "'' == 0 is true. null == undefined is true. false == 0 is true. Always use ===. One valid use of ==: x == null catches both null AND undefined in one check." },
+    { q: "What values are falsy in JavaScript?", opts: ["false, null, undefined only", "false, 0, -0, 0n, '', null, undefined, NaN", "false, null, undefined, [], {}", "false and 0 only"], correct: 1, explain: "Complete falsy list: false, 0, -0, 0n, '', null, undefined, NaN. Everything else is truthy — including [], {}, 'false', '0'. [] and {} being truthy surprises many." },
+    { q: "What does NaN === NaN return?", opts: ["true", "false — NaN is the only value not equal to itself. Use Number.isNaN()", "TypeError", "undefined"], correct: 1, explain: "NaN !== NaN is unique in JavaScript. isNaN('hello') returns true (coerces first — misleading). Number.isNaN('hello') returns false (no coercion). Always use Number.isNaN() for reliable detection." },
+  ],
+  'ji-immutability': [
+    { q: "What does Object.freeze() do to nested objects?", opts: ["Deep freezes everything", "Shallow freeze only — nested objects still mutable", "Throws error on nested", "Auto-deep freezes"], correct: 1, explain: "Object.freeze() is SHALLOW. Object.freeze({ nested: {x:1} }) — obj.nested = {} throws, but obj.nested.x = 99 works! For deep immutability: recursively freeze or use Immer." },
+    { q: "How does Immer achieve immutability?", opts: ["Deep cloning everything", "Uses Proxy to let you write mutating code that produces a new immutable copy", "Uses Object.freeze internally", "Uses WeakMap"], correct: 1, explain: "Immer's produce() wraps state in a Proxy (draft). Write normal mutating code on draft. Immer records changes and creates new immutable copy. Original untouched. This is how Redux Toolkit createSlice works." },
+  ],
+  'ji-debounce': [
+    { q: "What should debounce do?", opts: ["Call immediately", "Delay execution until N ms after the LAST call — resets timer on each call", "Call once per interval", "Queue all calls"], correct: 1, explain: "debounce(fn, 300): each call cancels previous timer and sets new 300ms timer. Only final call (after 300ms silence) executes fn. Use for: search input, form auto-save, resize handler." },
+    { q: "How do you implement debounce from scratch?", opts: ["Use setTimeout directly", "Store timer in closure, clearTimeout on each call, setTimeout to schedule", "Use requestAnimationFrame", "Use Proxy"], correct: 1, explain: "function debounce(fn, delay) { let timer; return function(...args) { clearTimeout(timer); timer = setTimeout(() => fn.apply(this, args), delay); }; } — key: clearTimeout before setTimeout." },
+  ],
+  'ji-currying': [
+    { q: "What is currying?", opts: ["A cooking technique", "Transforming f(a,b,c) into f(a)(b)(c) — chain of functions each taking one argument", "Partial application with all args", "Sorting algorithm"], correct: 1, explain: "curry(fn)(a)(b)(c) — each call takes one arg and returns next function until all args collected. Enables partial application: const add5 = curriedAdd(5)." },
+    { q: "What does compose(f, g, h)(x) do?", opts: ["Runs independently", "f(g(h(x))) — applies right-to-left. h runs first, result to g, result to f.", "h(g(f(x)))", "Runs in parallel"], correct: 1, explain: "compose applies right-to-left: compose(f, g, h)(x) = f(g(h(x))). pipe() is left-to-right. pipe is more readable for data transformation pipelines." },
+  ],
+
+  // ── React Interview Round ──────────────────────────────────────
+  'ri-reconciliation': [
+    { q: "What is React reconciliation?", opts: ["Rendering to DOM directly", "Diffing new virtual DOM against previous to find minimal set of DOM changes needed", "Updating component state", "Hydrating server HTML"], correct: 1, explain: "Reconciliation: React builds new virtual DOM tree, diffs against previous tree using reconciliation algorithm, applies only actual changes to real DOM." },
+    { q: "Why do stable keys matter in lists?", opts: ["CSS styling", "Keys let React identify which items changed/moved/removed — without stable keys, React may destroy and recreate components unnecessarily", "Required by JSX", "TypeScript typing"], correct: 1, explain: "Without stable keys, React cannot tell if item at position 2 is the same item or a new one. It may destroy and recreate DOM unnecessarily, losing component internal state." },
+  ],
+  'ri-fiber': [
+    { q: "What problem did React Fiber solve?", opts: ["Slow virtual DOM diffing", "Rendering was synchronous and uninterruptible — long renders blocked main thread, causing dropped frames", "Memory leaks", "Large bundle sizes"], correct: 1, explain: "The old stack reconciler ran to completion — a 300ms render blocked everything including user input. Fiber breaks rendering into pauseable units, enabling Concurrent Mode." },
+    { q: "What are the two phases of React rendering in Fiber?", opts: ["Mount and update", "Render phase (interruptible, builds fiber tree) and Commit phase (synchronous, applies DOM changes)", "Diffing and patching", "Creation and execution"], correct: 1, explain: "Render phase: React calls component functions and builds new fiber tree — pure, interruptible in Concurrent Mode. Commit phase: applies changes to real DOM — always synchronous and runs to completion." },
+  ],
+  'ri-useeffect': [
+    { q: "What causes a stale closure in useEffect?", opts: ["Using async/await", "Effect captures variable at render time but deps array is empty — never re-runs, always reads old captured value", "Multiple effects", "Missing React import"], correct: 1, explain: "useEffect(() => { setInterval(() => setCount(count + 1), 1000); }, []) — count captured as 0 forever. setCount(0+1) every second stays at 1. Fix: setCount(c => c+1) functional updater." },
+    { q: "When does useEffect cleanup run?", opts: ["Only on unmount", "Before the NEXT effect runs AND on unmount — runs every time the effect re-runs to prevent stale subscriptions", "After every render", "Only when deps change"], correct: 1, explain: "Cleanup runs: 1) Before next effect execution when deps change. 2) On component unmount. This ensures no stale subscriptions — each effect cleans up previous before setting up new." },
+  ],
+  'ri-context': [
+    { q: "Why does Context cause unnecessary re-renders?", opts: ["Context is slow", "All consumers re-render when context value reference changes, even if only unrelated fields changed", "Context uses polling", "Context skips batching"], correct: 1, explain: "Context re-renders ALL consumers when value changes by reference. {user, theme, notifications} in one context — changing notifications re-renders components that only use user." },
+    { q: "Best way to prevent Context re-renders?", opts: ["useCallback everywhere", "Split context by concern and memoize each provider value with useMemo", "Avoid Context entirely", "Use Redux instead"], correct: 1, explain: "Splitting: UserContext, ThemeContext, NotifContext — components only subscribe to what they use. useMemo(() => ({user, setUser}), [user]) prevents new references on every render." },
+  ],
+  'ri-hooks-rules': [
+    { q: "Why can't you call hooks inside conditions or loops?", opts: ["Technical limitation only", "Hooks rely on call order — React uses indexed array. Conditional hooks change order, corrupting the state array.", "Performance reason", "TypeScript requires it"], correct: 1, explain: "React tracks hook state by call order. useState[0] is first hook, useState[1] is second. Skip a hook conditionally — all subsequent hooks read from wrong slot. State array shifts." },
+    { q: "What are the two rules of Hooks?", opts: ["Only use in classes, only useState", "1. Only call at top level. 2. Only call from React functions (components or custom hooks).", "Use in any function", "Call in any order"], correct: 1, explain: "Rule 1: Call hooks at the top level — not inside conditions, loops, or nested functions. Rule 2: Only call from React function components or custom hooks." },
+  ],
+  'ri-batching': [
+    { q: "What is automatic batching in React 18?", opts: ["React auto-chunks renders", "Multiple setState calls grouped into single re-render, even in setTimeout and Promises", "Auto-memoizes components", "Batches DOM writes"], correct: 1, explain: "React 18 extended batching to ALL contexts — setTimeout, Promises, native events. Previously only event handlers. Multiple setStates in async code = one re-render instead of one per call." },
+    { q: "How do you opt out of batching in React 18?", opts: ["Cannot opt out", "flushSync(() => setState(...)) — forces synchronous DOM update immediately", "unstable_batchedUpdates()", "ReactDOM.flush()"], correct: 1, explain: "flushSync(() => setState(newValue)) forces React to flush and re-render synchronously. DOM updates immediately after flushSync returns. Use sparingly — mainly for integrating with non-React code." },
+  ],
+  'ri-custom-hooks': [
+    { q: "What is a custom hook?", opts: ["Built-in React hook", "A function starting with 'use' that calls other hooks and encapsulates reusable stateful logic", "An event handler", "A class method"], correct: 1, explain: "A custom hook is any function starting with 'use' that calls React hooks internally. The 'use' prefix tells React's ESLint plugin to enforce rules of hooks within that function." },
+    { q: "Why must custom hooks start with 'use'?", opts: ["JavaScript requires it", "React ESLint plugin uses it to enforce rules of hooks within that function", "Convention with no technical reason", "Enables TypeScript inference"], correct: 1, explain: "The 'use' prefix signals to react-hooks/rules-of-hooks ESLint rule that this function must follow hook rules. Without it, hooks inside can be called conditionally without linter catching it." },
+  ],
+  'ri-patterns': [
+    { q: "When should you use HOC vs custom hook?", opts: ["HOC always", "Custom hooks for logic reuse (most cases). HOC when you need to wrap component in another component.", "Render props always", "Interchangeable"], correct: 1, explain: "Custom hooks: logic reuse without component nesting — modern default. HOC: when you need to wrap the component (withAuth, withLogging) — creates wrapper layers. Custom hooks replaced most HOC use cases." },
+  ],
+  'ri-concurrent': [
+    { q: "What is useTransition used for?", opts: ["CSS transitions", "Marking state updates as non-urgent — React can interrupt them for urgent updates like user input", "Delaying API calls", "Creating animations"], correct: 1, explain: "useTransition: [isPending, startTransition]. Wrap non-urgent updates in startTransition. React prioritizes urgent work (typing) over transitions, which can be deferred. UI stays responsive." },
+    { q: "What does useDeferredValue do?", opts: ["useCallback equivalent", "Returns a lagging copy of a value that updates when React has time — like a React-aware debounce", "useRef equivalent", "Same as useEffect"], correct: 1, explain: "useDeferredValue(value) is like React-aware debounce. Deferred value lags behind during high-priority renders. Use to show stale search results while computing new ones, keeping input responsive." },
+  ],
+
+  // ── Machine Coding Round (additional) ──────────────────────────
+  'mc-autocomplete': [
+    { q: "User types 'r','e','a','c','t' in 200ms. With debounce(300ms), how many API calls fire?", opts: ["5 — one per keystroke", "1 — after 300ms of silence", "2 — first and last", "0"], correct: 1, explain: "Each keystroke resets the 300ms timer. After 't', 300ms silence passes → exactly ONE request fires for 'react'." },
+    { q: "What race condition must autocomplete handle?", opts: ["Two users typing", "Older response arriving after newer — 'rea' response overwrites 'react' results", "API rate limiting", "Keyboard conflicts"], correct: 1, explain: "User types fast: requests for 'r','re','rea'. If 'rea' response arrives after 'react' response, it shows wrong results. Fix: AbortController cancels previous request on each new keystroke." },
+  ],
+  'mc-infinite-scroll': [
+    { q: "What API is best for detecting viewport entry?", opts: ["scroll event listener", "IntersectionObserver — off-main-thread, fires only at threshold, handles nested scrollers", "getBoundingClientRect in setTimeout", "ResizeObserver"], correct: 1, explain: "IntersectionObserver runs off-main-thread, fires only when threshold is crossed (not every scroll pixel), handles nested scroll containers, requires zero math." },
+    { q: "How do you handle errors without losing loaded items?", opts: ["Reset to page 1", "Show error below existing items with Retry button — preserve all loaded data", "Full page error", "Reload page"], correct: 1, explain: "Never clear existing items on error. Keep loaded data visible, show error at bottom: 'Failed to load more. [Retry]'. On retry, attempt same page number. Netflix/Twitter pattern." },
+  ],
+  'mc-modal': [
+    { q: "Why use React Portal for modals?", opts: ["Better performance", "Modals inside nested components inherit parent CSS (overflow:hidden, z-index) — portaling to document.body escapes all constraints", "Easier animations", "Required for accessibility"], correct: 1, explain: "A modal inside overflow:hidden gets clipped. Portal renders DOM inside document.body, outside any CSS constraints. React event bubbling still works through the React tree." },
+    { q: "What must happen to focus when a modal closes?", opts: ["Focus goes to body", "Return focus to the element that triggered the modal", "Focus first link on page", "Focus is cleared"], correct: 1, explain: "Save document.activeElement before opening. After modal closes, call savedElement.focus(). Without this, keyboard users lose their place — focus disappears or lands somewhere unexpected." },
+  ],
+  'mc-virtual-list': [
+    { q: "What problem does virtual scrolling solve?", opts: ["Slow network requests", "Rendering 10,000 DOM nodes causes jank — virtual scrolling renders only ~20 visible items regardless of total size", "CSS performance", "Memory leaks"], correct: 1, explain: "Each DOM node has memory, style recalculation, and paint cost. 10,000 items = seconds of rendering. Virtual scrolling maintains a fixed DOM window (~20-30 items) that moves as user scrolls." },
+    { q: "What is overscan?", opts: ["Scanning beyond viewport", "Rendering extra items above/below visible area to prevent blank flashes during fast scrolling", "Overriding scroll behavior", "Pre-fetching data"], correct: 1, explain: "Without overscan: fast scrolling outpaces rendering, showing blank areas. Overscan renders 3-5 extra items above/below viewport. Users see them as they scroll in — eliminates blank flash." },
+  ],
+  'mc-toast': [
+    { q: "What accessibility attribute is critical for toasts?", opts: ["aria-hidden", "aria-live='polite' — screen readers announce new toasts without interrupting", "tabIndex=0", "aria-disabled"], correct: 1, explain: "Toast container: aria-live='polite' aria-atomic='true'. Announces new content to screen readers when user is idle. For errors: role='alert' announces immediately (assertive)." },
+    { q: "How do you animate toasts OUT without React removing DOM immediately?", opts: ["display:none toggle", "Mark as 'exiting', play CSS animation, call actual removal in onAnimationEnd", "setTimeout matching animation", "opacity only"], correct: 1, explain: "React removes DOM on state change — exit animations need a delay. Pattern: setExiting(true) → CSS animation plays → onAnimationEnd → remove from state array." },
+  ],
+  'mc-kanban': [
+    { q: "How do you implement optimistic updates in Kanban?", opts: ["Wait for server", "Move card immediately, send API, revert to snapshot on failure", "Disable while saving", "Show spinner"], correct: 1, explain: "Optimistic: 1) Snapshot board state. 2) Apply move immediately. 3) Send API call. 4) On success: nothing. 5) On failure: restore snapshot + show error toast. Users never wait for the server." },
+  ],
+  'mc-multistep-form': [
+    { q: "Where should multi-step form state live?", opts: ["Each step manages own", "In parent component or shared useForm — all steps share one state for review step", "localStorage", "URL params"], correct: 1, explain: "Lifting state to parent enables: review step, conditional steps, cross-step validation, draft saving. React Hook Form supports multi-step with single useForm instance shared via FormProvider." },
+    { q: "How do you validate each step before advancing?", opts: ["HTML required only", "Call trigger(['field1','field2']) for current step's fields — advance only if valid", "Validate on final submit", "Disable Next always"], correct: 1, explain: "RHF: const isValid = await trigger(['email', 'password']). If true, increment step. Validates only current step without submitting. Shows per-step errors while preventing invalid advancement." },
+  ],
+  'mc-rbac': [
+    { q: "Why must authorization also be enforced server-side?", opts: ["Not needed", "Frontend RBAC is cosmetic — users can bypass via DevTools or direct API calls. Server must verify every request.", "For performance", "For logging only"], correct: 1, explain: "Any user can open DevTools, remove admin check, see UI. Or call API directly with valid JWT. Server must check: does this JWT's role have permission? Frontend RBAC = UX only. Backend RBAC = security." },
+    { q: "How do you implement a Can component for permission hiding?", opts: ["Always render with opacity:0", "Component that only renders children if user has required permission — null otherwise", "CSS pointer-events:none", "Conditional with user.role==='admin'"], correct: 1, explain: "function Can({ permission, children }) { return user?.permissions?.includes(permission) ? children : null; } — centralizes permission logic. <Can permission='delete_user'><DeleteButton /></Can>." },
+  ],
+
+  // ── Debugging Round ──────────────────────────────────────────
+  'db-react-renders': [
+    { q: "First tool to find unnecessary re-renders?", opts: ["console.log in render", "React DevTools Profiler — 'Why did this render?' shows exact cause", "Chrome Performance", "Network tab"], correct: 1, explain: "React DevTools Profiler: record interaction → click component → see 'Why did this render?' with exact prop/state/context that changed. No guesswork needed." },
+    { q: "React.memo component still re-renders on every parent render. Why?", opts: ["React.memo broken", "A prop is new object/function reference created inline each parent render — memo does reference equality", "Child has state", "React 18 changed memo"], correct: 1, explain: "React.memo does shallow comparison. <Child config={{color:'red'}} /> creates new {} on every parent render. Memo sees different reference each time → re-renders. Fix: useMemo for objects, useCallback for functions." },
+  ],
+  'db-memory-leak': [
+    { q: "What Chrome DevTools panel detects memory leaks?", opts: ["Network panel", "Performance Monitor — watch JS Heap Size. Continuous upward slope = leak. Healthy = sawtooth.", "Sources panel", "Application panel"], correct: 1, explain: "Performance Monitor (More Tools → Performance Monitor): watch JS Heap Size over interactions. Healthy: grows then drops on GC. Leaking: steadily grows, never fully drops." },
+    { q: "Most common React memory leak cause?", opts: ["Using useState", "Event listeners/subscriptions in useEffect without cleanup — hold component references", "Large state objects", "Too many components"], correct: 1, explain: "useEffect(() => { window.addEventListener('resize', handler); }, []) — no cleanup. On unmount, handler still references component via closure. Fix: return () => window.removeEventListener('resize', handler)." },
+  ],
+  'db-network': [
+    { q: "What does TTFB measure?", opts: ["Total transfer time", "Time from request sent to first byte received — high TTFB = slow server processing or no CDN", "DNS lookup time only", "TCP handshake time"], correct: 1, explain: "TTFB > 600ms indicates server-side problems: slow database queries, expensive computations, cold serverless starts, or physical distance to server (no CDN). Separate from download time." },
+    { q: "Long yellow bar in Network waterfall means?", opts: ["Slow download", "Waiting (TTFB) — server is processing. Yellow = waiting, blue = downloading content", "DNS lookup", "SSL handshake"], correct: 1, explain: "Waterfall colors: gray = stalled, yellow = waiting/TTFB, blue = content download. Long yellow + short blue = server bottleneck. Long blue + short yellow = large file." },
+  ],
+  'db-performance': [
+    { q: "How do you read a flame chart?", opts: ["Server temperature", "Top-down call stack where width = time. Widest block at deepest level = bottleneck.", "Network timeline", "Memory visualization"], correct: 1, explain: "Flame chart: each row = call stack level. Width proportional to time. Find the widest block at the deepest level — that's the actual bottleneck. Everything above it is just the call chain." },
+    { q: "What is a Long Task?", opts: ["Task > 10ms", "JS task blocking main thread > 50ms — prevents browser responding to input, causes jank", "Network request > 1s", "Task using > 10MB"], correct: 1, explain: "Long Tasks (>50ms) block user input — clicks/scrolls queue while they run. Shown in red in Performance panel. Break them up with scheduler.yield() or setTimeout(0) between chunks." },
+  ],
+  'db-hydration': [
+    { q: "What causes hydration mismatch?", opts: ["Slow server", "Server HTML doesn't match client render — Date.now(), window, Math.random() differ between server and client", "Missing CSS", "Network errors"], correct: 1, explain: "Hydration compares server HTML to client React tree. Common causes: Date.now(), window checks without guards, CSS-in-JS class differences, browser extensions injecting DOM nodes." },
+    { q: "How do you fix browser-only API hydration issues?", opts: ["suppressHydrationWarning everywhere", "Use useEffect to read browser values after mount — server renders null/default, client updates after hydration", "Wrap in try/catch", "Check process.env"], correct: 1, explain: "function Component() { const [w, setW] = useState(0); useEffect(() => setW(window.innerWidth), []); return <div>{w}</div>; } — server renders 0, client updates after mount. No mismatch." },
+  ],
+  'db-production': [
+    { q: "How do source maps help debug production errors?", opts: ["Make code larger", "Map minified positions back to original source — 'bundle.min.js:1:45823' becomes 'UserProfile.tsx:42'", "Development only", "Slow down production"], correct: 1, explain: "Without source maps: 'TypeError at bundle.min.js:1:45823'. With source maps (uploaded to Sentry): 'TypeError at src/components/UserProfile.tsx:42'. Upload privately — Sentry symbolicates server-side." },
+    { q: "A bug only reproduces in production. First step?", opts: ["Deploy debug build", "Check error monitoring for exact error, stack trace, user context, browser/OS — reproduce with same conditions", "Roll back", "Ask user to record"], correct: 1, explain: "Production-only bugs: 1) Different env vars. 2) Build differences (minification, tree shaking). 3) Specific user data. Error monitoring with user context and session data narrows it down fast." },
+  ],
+  'db-stale-closure': [
+    { q: "What is a stale closure?", opts: ["Stopped component", "A useEffect or callback that captured outdated variable — reads old state instead of current value", "Uncleaned listener", "Memory leak"], correct: 1, explain: "useEffect(() => { setInterval(() => console.log(count), 1000); }, []) — count captured as initial value (0) forever. Every interval fires with count=0 despite state updating." },
+    { q: "What is the functional updater pattern?", opts: ["Always use it", "setCount(c => c+1) — receives latest state as c regardless of closure. Use when new state depends on previous in async callbacks.", "Only in useReducer", "Complex state only"], correct: 1, explain: "setCount(c => c+1): React passes most recent state as c — regardless of closure. Essential in setInterval, setTimeout, async callbacks where closure may be stale." },
+  ],
+
+  // ── Performance Interview Round ──────────────────────────────────────
+  'pi-cwv': [
+    { q: "What are the three Core Web Vitals?", opts: ["FCP, TTI, TBT", "LCP (loading), INP (interactivity), CLS (visual stability) — affect SEO rankings", "TTFB, FID, Speed Index", "PageSpeed, Lighthouse, WebPageTest"], correct: 1, explain: "LCP: Largest Contentful Paint — when main content appears (<2.5s good). INP: Interaction to Next Paint — response to input (<200ms). CLS: Cumulative Layout Shift — unexpected movement (<0.1)." },
+    { q: "LCP 3.8s. Hero is CSS background-image. Fix?", opts: ["Convert to WebP", "Replace with <img> + <link rel='preload'> — CSS background images discovered late after CSS downloads", "Add loading='eager'", "Compress more"], correct: 1, explain: "CSS background images: HTML → CSS download → CSS parse → find image URL → download. Three blocking steps. <img> + preload starts download during HTML parse. Biggest LCP improvement." },
+  ],
+  'pi-bundle': [
+    { q: "What is the difference between tree shaking and code splitting?", opts: ["Same thing", "Tree shaking: removes unused exports at build time. Code splitting: breaks bundle into on-demand chunks at runtime.", "Tree shaking is for CSS", "Code splitting is CSS"], correct: 1, explain: "Tree shaking: static analysis removes exports nobody imports — build time, reduces bundle. Code splitting: separate chunks loaded when needed — runtime, reduces initial load." },
+    { q: "Bundle analyzer shows moment.js at 67KB. You use one date format. Fix?", opts: ["Compress moment", "Replace with date-fns: import { format } from 'date-fns' — tree-shakeable, ~2KB vs always-67KB", "Lazy load moment", "Import only locale"], correct: 1, explain: "moment.js is CJS — not tree-shakeable. Any import includes all 67KB. date-fns is ESM — import { format } adds only ~2KB. One of the highest-ROI bundle optimizations." },
+  ],
+  'pi-images': [
+    { q: "Why never add loading='lazy' to the LCP image?", opts: ["Lazy loading is bad", "Lazy loading defers download until near viewport — LCP image IS in viewport. Directly worsens LCP score.", "Causes CLS", "Breaks Safari"], correct: 1, explain: "loading='lazy' means: don't download until near viewport. For above-fold hero image already in viewport, this adds unnecessary delay. Use fetchpriority='high' on the LCP image instead." },
+    { q: "What does srcset solve?", opts: ["Multiple fallbacks", "Provides size variants — browser picks optimal size for screen width and DPR. Mobile downloads small version.", "SEO only", "Responsive layouts only"], correct: 1, explain: "<img srcset='hero-400.webp 400w, hero-800.webp 800w' sizes='(max-width:640px) 400px, 800px'> — browser calculates viewport × DPR → picks smallest sufficient version." },
+  ],
+  'pi-lighthouse': [
+    { q: "TBT=850ms (red), LCP=2.1s (green), CLS=0.05 (green). Focus first?", opts: ["LCP — most important", "TBT — 30% score weight and red. Reducing long JS tasks gives biggest score improvement.", "CLS always first", "All equally"], correct: 1, explain: "TBT has highest weight (30%) and is in the red. LCP is passing. CLS excellent. Fixing long tasks (code splitting, lazy loading, yield) gives most dramatic score improvement." },
+    { q: "Lighthouse vs CrUX — what is the difference?", opts: ["Same", "Lighthouse: synthetic test on your machine. CrUX: real Chrome users worldwide on actual devices/networks.", "CrUX more accurate for your machine", "Lighthouse uses real data"], correct: 1, explain: "Lighthouse runs on your fast dev machine (even with throttling). CrUX is 28 days real Chrome users — P75. A page can score 95 Lighthouse but fail for real mobile users on 3G." },
+  ],
+  'pi-caching': [
+    { q: "max-age=3600 vs no-cache — difference?", opts: ["no-cache means never cache", "max-age=3600: serve from cache for 1 hour, no network. no-cache: always revalidate but may use cache if server returns 304.", "Same", "no-cache is for private data"], correct: 1, explain: "max-age=3600: browser serves cached version for 3600s — zero network requests. no-cache: must check server every time (ETag/If-None-Match), server can respond 304 (use your cache) — fast but always validates." },
+    { q: "Best caching strategy for content-hashed JS assets?", opts: ["Cache-Control: no-cache", "Cache-Control: max-age=31536000, immutable — cache forever, hash changes when content changes so URL changes", "Cache-Control: max-age=3600", "ETags only"], correct: 1, explain: "Content-hash filenames: same URL = same content = safe to cache forever. New deploy = new hash = new URL = browser fetches fresh. immutable skips revalidation even on Ctrl+F5." },
+  ],
+  'pi-rendering': [
+    { q: "Marketing page, changes weekly. Best strategy?", opts: ["SSR — freshest", "SSG — build once, CDN-served, fastest possible for rarely-changing content", "CSR — simplest", "ISR with revalidate=60"], correct: 1, explain: "SSG: built at deploy time → CDN edge → zero server computation per request → fastest TTFB (<50ms). For weekly-changing content, SSG + rebuild on change or ISR with long revalidate is optimal." },
+    { q: "When is SSR better than SSG?", opts: ["Always — fresher is better", "When content is user-specific (dashboard) or changes more frequently than you can rebuild", "Never", "Only for auth pages"], correct: 1, explain: "SSR: personalized pages, real-time data, auth-gated content. 1000 users get 1000 different pages — SSG can't pre-render all combinations. SSR or CSR after auth is the right choice." },
+  ],
+  'pi-compression': [
+    { q: "Gzip vs Brotli — which is better?", opts: ["Identical", "Brotli: 15-25% better compression. Gzip: universal support, faster. Pre-compress static assets with Brotli at build time.", "Gzip better for JS", "Brotli only for images"], correct: 1, explain: "300KB JS: Gzip → ~100KB, Brotli → ~80KB. Brotli compresses ~15-25% better. All modern browsers support Brotli. Pre-compress at build time (it is slow) and serve pre-compressed files directly from server." },
+    { q: "How does HTTP/2 multiplexing help?", opts: ["Compresses more", "Multiple requests over ONE connection simultaneously — eliminates 6-connection limit and request queuing", "Faster for large files only", "Removes need for CDNs"], correct: 1, explain: "HTTP/1.1: max 6 parallel connections per domain. 20 assets queue in groups of 6. HTTP/2: one TCP connection, multiplexes all 20 simultaneously as binary frames. No queuing." },
+  ],
+
+  // ── Rapid Fire ──────────────────────────────────────────────
+  'rf-debounce-throttle': [
+    { q: "Debounce vs throttle — key difference?", opts: ["Debounce is faster", "Debounce: fires once after activity stops. Throttle: fires at most once per interval.", "Same", "Throttle waits for silence"], correct: 1, explain: "Debounce: waits for pause — use for search input, auto-save. Throttle: limits rate — fires then blocks for N ms — use for scroll, resize handlers." },
+  ],
+  'rf-event-loop-1min': [
+    { q: "Event loop in one sentence?", opts: ["Loops through events", "Run sync code, drain all microtasks (Promises), run one macrotask (setTimeout), repeat", "Handles async requests", "Manages the DOM"], correct: 1, explain: "Order: 1) Sync code. 2) ALL microtasks (Promise.then, async/await). 3) ONE macrotask (setTimeout). 4) Repeat. This is why Promise always runs before setTimeout(fn, 0)." },
+  ],
+  'rf-closure': [
+    { q: "What is a closure in one sentence?", opts: ["A private function", "A function that remembers variables from its outer scope even after that scope finished executing", "An IIFE", "A module pattern"], correct: 1, explain: "Closure: inner function references outer scope variables, keeping them alive. The inner function 'closes over' those variables — they persist even after outer function returns." },
+  ],
+  'rf-hoisting': [
+    { q: "What is hoisting?", opts: ["Moving code to bottom", "JS moves declarations to top of scope — var as undefined, functions fully, let/const in TDZ", "Runtime optimization", "Module loading"], correct: 1, explain: "Hoisting: engine registers var (as undefined) and function declarations (fully) before executing any code. let/const hoisted but not initialized (TDZ). Functions can be called before they appear in code." },
+  ],
+  'rf-map-foreach': [
+    { q: "map vs forEach — key difference?", opts: ["map is faster", "map returns new array with transformed values. forEach returns undefined — side effects only, cannot chain.", "forEach is newer", "Identical"], correct: 1, explain: "map: transforms each element → returns new array. Can chain: [1,2,3].map(x=>x*2).filter(x=>x>2). forEach: returns undefined — cannot chain. Use map when you need the resulting array." },
+  ],
+  'rf-memoization': [
+    { q: "What is memoization?", opts: ["Writing comments", "Caching function return values — same input returns cached result without recomputing", "Memory optimization", "Garbage collection"], correct: 1, explain: "Memoization: cache results keyed by arguments. Same args = return cached value instantly. Only works for pure functions. Used in useMemo (expensive computations), useCallback (stable function references), React.memo (component re-renders)." },
+  ],
+  'rf-hydration': [
+    { q: "What is hydration?", opts: ["Adding water to data", "React attaching event listeners to server-rendered HTML, making it interactive", "Loading CSS", "Fetching initial data"], correct: 1, explain: "Hydration: React takes server-rendered static HTML and attaches event listeners and React state. React 'hydrates' existing DOM rather than creating from scratch. Mismatch between server/client render = hydration error." },
+  ],
+  'rf-reconciliation': [
+    { q: "What is reconciliation?", opts: ["Managing conflicts", "React's algorithm to diff new virtual DOM against previous and compute minimal real DOM changes", "Handling errors", "Managing state"], correct: 1, explain: "Reconciliation: React builds new virtual DOM tree, diffs against previous, applies only actual changes to real DOM. Key prop helps React identify list items to avoid unnecessary recreations." },
+  ],
+  'rf-lazy-loading': [
+    { q: "What is lazy loading?", opts: ["Loading slowly", "Deferring resource loading until needed — images, routes, components load only when required", "Background loading", "Preloading resources"], correct: 1, explain: "Lazy loading defers downloads. Images: loading='lazy'. Components: React.lazy(). Routes: dynamic import(). Reduces initial load size — users only download what they actually need." },
+  ],
+  'rf-tree-shaking': [
+    { q: "What is tree shaking?", opts: ["Removing CSS", "Bundler eliminates unused exports via static analysis of ES module import/export — dead code removal", "Optimizing images", "Splitting bundles"], correct: 1, explain: "Tree shaking: bundler analyzes which exports are actually imported. Unused code is 'shaken off'. Requires ES module syntax. import _ from 'lodash' prevents tree shaking — use named imports." },
+  ],
+  'rf-ssr': [
+    { q: "What is SSR?", opts: ["Single Source Reality", "Server-Side Rendering — HTML generated on server per request. Good for SEO and fast FCP.", "Synchronized State Rendering", "Streaming Server Routing"], correct: 1, explain: "SSR: server generates complete HTML per request. Browser receives full HTML immediately — good for SEO and First Contentful Paint. JavaScript hydrates for interactivity afterward." },
+  ],
+  'rf-csr': [
+    { q: "What is CSR?", opts: ["Cached Static Resources", "Client-Side Rendering — HTML built in browser via JS. Fast navigation, slow initial load.", "Component State Rendering", "Core Static Resources"], correct: 1, explain: "CSR: server sends minimal HTML + JS bundle. Browser runs React, builds DOM. Slow initial load (blank page until JS runs) but fast navigation. Poor SEO without SSR." },
+  ],
+  'rf-auth-authz': [
+    { q: "Authentication vs authorization?", opts: ["Same", "Authentication: who are you? (verify identity). Authorization: what can you do? (check permissions).", "Authorization comes first", "Auth is server-side only"], correct: 1, explain: "Authenticate first (login → verify identity → token), then authorize (check if this user has permission for this action). Both required — authentication without authorization = anyone can do anything." },
+  ],
+  'rf-cors': [
+    { q: "What is CORS?", opts: ["A vulnerability", "Browser mechanism controlling cross-origin requests — servers declare allowed origins via response headers", "A language", "An HTTP method"], correct: 1, explain: "CORS: when JS makes request to different origin, browser checks Access-Control-Allow-Origin header. If origin not listed, browser blocks reading the response. Protects users from malicious cross-origin data access." },
+  ],
+  'rf-xss': [
+    { q: "What is XSS?", opts: ["Extra Style Sheets", "Cross-Site Scripting — attacker injects malicious scripts that execute in victims' browsers", "A framework", "A type of SQL injection"], correct: 1, explain: "XSS: inject script into page viewed by other users. Script runs in victims' browsers with full page permissions. Prevention: textContent instead of innerHTML, CSP headers, DOMPurify sanitization." },
+  ],
+  'rf-csrf': [
+    { q: "What is CSRF?", opts: ["A JavaScript error", "Cross-Site Request Forgery — tricks authenticated users into unintended requests via automatic cookie attachment", "Caching strategy", "Rendering pattern"], correct: 1, explain: "CSRF: user logged into bank.com. evil.com makes request to bank.com. Browser auto-attaches bank.com cookies → bank authenticates it. Fix: SameSite=Strict/Lax cookies, CSRF tokens." },
+  ],
+  'rf-optimistic-ui': [
+    { q: "What is optimistic UI?", opts: ["Always showing success", "Update UI immediately before server confirms, roll back if it fails", "Caching UI state", "Preloading components"], correct: 1, explain: "Optimistic: user likes post → immediately show +1, flip button — before API responds. If request fails, roll back + show error. Creates instant-feeling interactions without waiting for server." },
+  ],
+  'rf-virtualization': [
+    { q: "What is virtualization?", opts: ["Running in a VM", "Only render visible list items — fixed DOM node count regardless of total list size", "CSS virtual layout", "SSR optimization"], correct: 1, explain: "Virtualization: 10,000 items but only ~20 DOM nodes exist. Items are absolutely positioned — visible window moves over data as you scroll. Libraries: TanStack Virtual, react-window." },
+  ],
+  'rf-code-splitting': [
+    { q: "What is code splitting?", opts: ["Breaking CSS", "Breaking JS bundle into chunks that load on demand — routes/components only downloaded when needed", "Splitting servers", "Team responsibilities"], correct: 1, explain: "Code splitting: React.lazy(() => import('./Dashboard')) — Dashboard's code only downloads when user navigates to it. Users never download code for routes they never visit." },
+  ],
+
 };
 
 export const FLASHCARDS = [

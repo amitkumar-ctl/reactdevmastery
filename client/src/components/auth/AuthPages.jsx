@@ -79,7 +79,15 @@ export const LoginPage = () => {
           </div>
 
           <div className={styles.fieldGroup}>
-            <label className={styles.label}>Password</label>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <label className={styles.label}>Password</label>
+              <span
+                style={{ fontSize: 11, color: '#4b5563', cursor: 'pointer' }}
+                onClick={() => toast('Password reset — contact support@reactdevmastery.dev', { icon: '🔒' })}
+              >
+                Forgot password?
+              </span>
+            </div>
             <div className={styles.passWrap}>
               <input
                 className={styles.input}
@@ -164,7 +172,7 @@ export const RegisterPage = () => {
         </div>
 
         <h1 className={styles.authTitle}>Create your account</h1>
-        <p className={styles.authSub}>Join 10,000+ engineers levelling up</p>
+        <p className={styles.authSub}>Start your path to senior engineer — free forever</p>
 
         <div className={styles.googleWrap}>
           <GoogleLogin
@@ -241,13 +249,10 @@ export const RegisterPage = () => {
               placeholder="Repeat your password"
               value={form.confirm}
               onChange={(e) => setForm({ ...form, confirm: e.target.value })}
-              autoComplete="new-password"
+              autoComplete="off"
             />
-          </div>
-
-          <button className={styles.submitBtn} type="submit" disabled={loading}>
             {loading ? <span className={styles.spinner} /> : 'Create Account →'}
-          </button>
+          </div>
         </form>
 
         <p className={styles.switchLink}>
@@ -274,7 +279,6 @@ const AuthVisual = () => (
         { icon: '🔒', text: 'Security: XSS, CSRF, JWT, OAuth' },
         { icon: '📊', text: 'Core Web Vitals & performance budgets' },
         { icon: '🏗️', text: 'System design & architecture patterns' },
-        { icon: '🤖', text: 'AI-powered explanations & code review' },
       ].map((f, i) => (
         <div key={i} className={styles.featureItem}>
           <span className={styles.featureIcon}>{f.icon}</span>
@@ -283,7 +287,7 @@ const AuthVisual = () => (
       ))}
     </div>
     <div className={styles.visualStats}>
-      {[['200+', 'Concepts'], ['50+', 'Quizzes'], ['12', 'Flash Cards'], ['AI', 'Tutor']].map(([n, l]) => (
+      {[['500+', 'Concepts'], ['500+', 'Quizzes'], ['50+', 'Topics'], ['Free', 'Forever']].map(([n, l]) => (
         <div key={l} className={styles.visualStat}>
           <div className={styles.visualStatNum}>{n}</div>
           <div className={styles.visualStatLabel}>{l}</div>

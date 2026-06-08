@@ -11,7 +11,8 @@ import { TopicPage, ConceptPage } from './pages/TopicPage';
 import FlashCards from './pages/FlashCards';
 import Leaderboard from './pages/Leaderboard';
 import Profile from './pages/Profile';
-import InterviewPrepPage from './pages/InterviewPrepPage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
+import ResetPasswordPage  from './pages/ResetPasswordPage';
 import QuizPage from './pages/QuizPage';
 
 // ── Protected Route ────────────────────────────────────────────────────
@@ -65,6 +66,8 @@ const App = () => (
 
         <Routes>
           {/* Public */}
+          <Route path="/forgot-password"       element={<PublicRoute><ForgotPasswordPage /></PublicRoute>} />
+          <Route path="/reset-password/:token" element={<PublicRoute><ResetPasswordPage /></PublicRoute>} />
           <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
           <Route path="/register" element={<PublicRoute><RegisterPage /></PublicRoute>} />
 

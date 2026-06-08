@@ -81,12 +81,14 @@ export const LoginPage = () => {
           <div className={styles.fieldGroup}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <label className={styles.label}>Password</label>
-              <span
-                style={{ fontSize: 11, color: '#4b5563', cursor: 'pointer' }}
-                onClick={() => toast('Password reset — contact support@reactdevmastery.dev', { icon: '🔒' })}
+              <Link
+                to="/forgot-password"
+                style={{ fontSize: 11, color: '#4b5563', textDecoration: 'none' }}
+                onMouseEnter={e => e.target.style.color = '#4facfe'}
+                onMouseLeave={e => e.target.style.color = '#4b5563'}
               >
                 Forgot password?
-              </span>
+              </Link>
             </div>
             <div className={styles.passWrap}>
               <input
@@ -251,8 +253,11 @@ export const RegisterPage = () => {
               onChange={(e) => setForm({ ...form, confirm: e.target.value })}
               autoComplete="off"
             />
-            {loading ? <span className={styles.spinner} /> : 'Create Account →'}
           </div>
+
+          <button type="submit" className={styles.submitBtn} disabled={loading}>
+            {loading ? <span className={styles.spinner} /> : 'Create Account →'}
+          </button>
         </form>
 
         <p className={styles.switchLink}>

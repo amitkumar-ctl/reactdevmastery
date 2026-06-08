@@ -22998,8 +22998,808 @@ scope: 'profile email contacts calendar drive' // ✗ over-privileged
   </div>
 );
 
+export const ProtoChainLearn = () => (
+  <div style={c.wrap}>
+    <RevealCard color='#a855f740' delay={0}>
+      <div style={c.title('#a855f7')}>🎬 The Prototype Chain — JavaScript's Hidden Superpower</div>
+      <p style={c.prose}>Every object in JavaScript has a secret link to another object. <strong style={{ color: '#a855f7' }}>This chain is how inheritance works, how methods are shared, and why toString() is available everywhere</strong>.</p>
+    </RevealCard>
+    <AnalogyCard emoji="🧬" title="DNA inheritance" analogy="You inherit traits from parents, who inherited from grandparents. You don't carry copies of all their DNA — you just know where to look. If you don't have a trait, check your parent; if they don't, check the grandparent." connection="Property lookup = checking your own traits first, then walking the ancestor chain. Object.prototype = the common ancestor of all objects." />
+    <StorySteps steps={[
+      { title: 'How property lookup works', color: '#a855f7', desc: 'JS checks own properties first, then walks [[Prototype]] until null.', code: `const animal = { breathes: true };
+const dog    = Object.create(animal);
+dog.legs = 4;
+
+console.log(dog.legs);     // 4     — own property
+console.log(dog.breathes); // true  — found on animal via chain
+console.log(dog.wings);    // undefined — not found anywhere
+
+// Chain: dog → animal → Object.prototype → null
+
+dog.hasOwnProperty('legs');     // true
+dog.hasOwnProperty('breathes'); // false — inherited` },
+      { title: 'Object.create — pure prototypal inheritance', color: '#4facfe', desc: 'Create objects that inherit from other objects directly.', code: `const vehicle = {
+  describe() { return \`\${this.type} with \${this.wheels} wheels\`; }
+};
+
+const car = Object.create(vehicle);
+car.type   = 'Car';
+car.wheels = 4;
+car.describe(); // 'Car with 4 wheels'
+
+// Object.create(null) — no prototype at all:
+const dict = Object.create(null);
+dict.toString; // undefined — truly empty hash map` },
+      { title: 'Reading prototypes safely', color: '#00ff88', desc: 'Use official APIs — avoid __proto__.', code: `// READ the prototype:
+Object.getPrototypeOf(dog); // returns animal
+
+// CHECK chain membership:
+animal.isPrototypeOf(dog);  // true
+
+// OWN vs inherited:
+Object.keys(dog);              // ['legs'] — own enumerable only
+Object.getOwnPropertyNames(dog); // ['legs'] — own incl non-enumerable
+for (const k in dog) console.log(k); // 'legs', 'breathes' — own + inherited` },
+    ]} />
+    <InlinePoll question="const obj = {}; What is Object.getPrototypeOf(Object.getPrototypeOf(obj))?" options={['{}', 'null — Object.prototype is the end of the chain, its [[Prototype]] is null', 'undefined', 'Object']} correct={1} explanation="Object.getPrototypeOf({}) = Object.prototype. Object.getPrototypeOf(Object.prototype) = null. Every prototype chain ends at null." />
+    <CommonMistake mistake="Using for...in and getting inherited properties you didn't expect." fix="for...in iterates own + inherited enumerable properties. Use Object.keys() for own only, or guard with hasOwnProperty: for (const k in obj) { if (obj.hasOwnProperty(k)) { ... } }" />
+    <DidYouKnow fact="Brendan Eich created JavaScript's prototype system in 10 days in 1995, inspired by the Self language. He was told to make it 'look like Java' so he added the new keyword — but underneath it remained purely prototypal. ES6 classes (2015) are still syntactic sugar over the same system Eich built in those 10 days." color="#a855f7" />
+    <InterviewMeter topics={[{ topic: 'Prototype chain property lookup order', freq: 90 }, { topic: 'Object.create vs new Constructor', freq: 85 }, { topic: 'hasOwnProperty vs inherited', freq: 80 }, { topic: 'Object.create(null) use case', freq: 70 }]} />
+  </div>
+);
+
+export const ProtoCreateLearn = () => (
+  <div style={c.wrap}>
+    <RevealCard color='#a855f740' delay={0}>
+      <div style={c.title('#a855f7')}>🎬 Object.create vs new — What Really Happens</div>
+      <p style={c.prose}>Three ways to create objects with inheritance: <strong style={{ color: '#a855f7' }}>Object.create(), new Constructor(), and class</strong>. They look different but all manipulate the same prototype chain.</p>
+    </RevealCard>
+    <AnalogyCard emoji="🏗️" title="Building from a blueprint" analogy="new Constructor = running a construction crew to build a new house AND linking it to the blueprint. Object.create = just linking a new house to an existing one, skipping the construction crew entirely." connection="new = runs constructor code + sets prototype. Object.create = sets prototype only. Both produce objects with the same inheritance chain." />
+    <StorySteps steps={[
+      { title: 'new Constructor — 4 steps', color: '#a855f7', desc: 'Four things happen automatically when you use new.', code: `function Dog(name) {
+  this.name = name; // Step 3: runs with this = new object
+}
+Dog.prototype.bark = function() { return this.name + ' barks!'; };
+
+const rex = new Dog('Rex');
+// Step 1: created {}
+// Step 2: {}.__proto__ = Dog.prototype
+// Step 3: ran Dog() — added name
+// Step 4: returned the object
+
+rex.bark();                   // 'Rex barks!' — from prototype
+rex.hasOwnProperty('name');   // true
+rex.hasOwnProperty('bark');   // false — inherited
+rex instanceof Dog;           // true` },
+      { title: 'Object.create — prototype only', color: '#4facfe', desc: 'Inherit the prototype without running constructor code.', code: `const DogProto = {
+  bark() { return this.name + ' barks!'; },
+};
+
+// No constructor called:
+const rex = Object.create(DogProto);
+rex.name = 'Rex'; // set manually
+
+rex.bark(); // 'Rex barks!'
+Object.getPrototypeOf(rex) === DogProto; // true
+
+// Factory function pattern:
+function createDog(name) {
+  const dog = Object.create(DogProto);
+  dog.name  = name;
+  return dog;
+}` },
+      { title: 'The constructor property trap', color: '#eab308', desc: 'Replacing .prototype entirely loses the constructor reference.', code: `function Dog(name) { this.name = name; }
+// Default: Dog.prototype.constructor === Dog ✓
+
+// ❌ Replace entire prototype — loses constructor:
+Dog.prototype = { bark() { return 'woof'; } };
+new Dog('Rex').constructor === Object; // true — broken!
+
+// ✅ Fix 1: restore constructor explicitly:
+Dog.prototype = { constructor: Dog, bark() { return 'woof'; } };
+
+// ✅ Fix 2: add methods individually (never breaks):
+Dog.prototype.bark = function() { return 'woof'; };` },
+    ]} />
+    <InlinePoll question="function Foo() {} const f = new Foo(); — f.__proto__ === ?" options={['Foo', "Foo.prototype — new sets instance [[Prototype]] to the constructor's .prototype property", 'Object.prototype', 'Function.prototype']} correct={1} explanation="new Foo() sets f.__proto__ to Foo.prototype. This is the core mechanic: methods added to Foo.prototype are shared by all instances via the chain." />
+    <CommonMistake mistake="Putting mutable data (arrays, objects) on the prototype instead of in the constructor." fix="Dog.prototype.tricks = [] — ALL instances share the same array. Push to one dog and every dog knows the trick. Always put mutable state in the constructor: function Dog() { this.tricks = []; }" />
+    <DidYouKnow fact="Object.create() was added in ES5 (2009) based on Douglas Crockford's beget() pattern. Crockford had argued for years that JS's prototypal inheritance should be used directly rather than simulated with constructors. Despite his advocacy, ES6 (2015) went the opposite direction and added Java-like class syntax." color="#a855f7" />
+    <InterviewMeter topics={[{ topic: 'The 4 steps of new', freq: 85 }, { topic: 'Object.create vs new difference', freq: 80 }, { topic: 'Mutable state on prototype bug', freq: 85 }, { topic: 'constructor property and when it breaks', freq: 70 }]} />
+  </div>
+);
+
+export const ProtoClassLearn = () => (
+  <div style={c.wrap}>
+    <RevealCard color='#a855f740' delay={0}>
+      <div style={c.title('#a855f7')}>🎬 ES6 Classes — Syntax Sugar, Not a New System</div>
+      <p style={c.prose}>Classes look like Java but they're <strong style={{ color: '#a855f7' }}>100% prototype-based underneath</strong>. Knowing the prototype reality lets you debug inheritance bugs that confuse developers who only know the sugar.</p>
+    </RevealCard>
+    <AnalogyCard emoji="🎭" title="A costume over the same body" analogy="ES6 classes are a costume that makes JavaScript look like Java. Underneath, it's the same prototype body it's always been. The costume makes writing easier, but when something breaks, you need to understand the body." connection="class = readable costume. prototype = actual mechanism. When you debug edge cases, you're dealing with prototypes whether you used class syntax or not." />
+    <StorySteps steps={[
+      { title: 'What class compiles to', color: '#a855f7', desc: 'Side by side — class syntax vs the prototype equivalent.', code: `// ES6 class:
+class Animal {
+  constructor(name) { this.name = name; }
+  speak() { return this.name + ' makes a sound'; }
+  static create(name) { return new Animal(name); }
+}
+
+// Exact equivalent (what JS actually does):
+function Animal(name) { this.name = name; }
+Animal.prototype.speak = function() { return this.name + ' makes a sound'; };
+Animal.create = function(name) { return new Animal(name); };
+
+// Identical results:
+typeof Animal;                          // 'function' — classes ARE functions
+Animal.prototype.constructor === Animal; // true` },
+      { title: 'extends and super', color: '#4facfe', desc: 'extends wires two prototype chains. super() calls the parent constructor.', code: `class Dog extends Animal {
+  constructor(name, breed) {
+    super(name);       // MUST come before 'this' — runs Animal constructor
+    this.breed = breed;
+  }
+  speak() {
+    return super.speak() + ' — specifically barks';
+  }
+}
+
+// What extends sets up:
+// Dog.prototype.__proto__  = Animal.prototype  (instance methods)
+// Dog.__proto__            = Animal            (static methods)
+
+const rex = new Dog('Rex', 'Lab');
+rex instanceof Dog;    // true
+rex instanceof Animal; // true` },
+      { title: 'Modern class features', color: '#00ff88', desc: 'Private fields, static, and class fields.', code: `class BankAccount {
+  currency = 'USD';    // public class field — on instance, not prototype
+
+  #balance;            // private field — engine-enforced
+  #owner;
+
+  constructor(owner, initial) {
+    this.#owner   = owner;
+    this.#balance = initial;
+  }
+
+  deposit(amount)  { this.#balance += amount; }
+  get balance()    { return this.#balance; }
+  static open(who) { return new BankAccount(who, 0); }
+}
+
+const acc = BankAccount.open('Alice');
+acc.deposit(100);
+acc.balance;    // 100
+acc.#balance;   // SyntaxError — truly private` },
+    ]} />
+    <InlinePoll question="class Foo {} — what does typeof Foo return?" options={["'class'", "'function' — classes are syntactic sugar. They are constructor functions.", "'object'", "'undefined'"]} correct={1} explanation="typeof Foo === 'function'. Classes ARE functions — just with extra rules: must use new, not hoisted like function declarations, always strict mode." />
+    <CommonMistake mistake="Thinking class methods are on instances — they're on the prototype, shared." fix="class Dog { bark() {} } — bark is on Dog.prototype, ONE copy shared by all instances. Only constructor assignments (this.name = name) create instance properties. Arrow class fields (bark = () => {}) put a copy on EACH instance — more memory but fixes 'this' binding." />
+    <DidYouKnow fact="The class keyword was controversial in TC39. Douglas Crockford opposed it, arguing it hid JS's prototypal nature. Others argued it made the language accessible to Java developers. The compromise: classes add NO new capability — purely syntactic sugar. The committee chose familiarity over purity." color="#a855f7" />
+    <InterviewMeter topics={[{ topic: 'class is syntactic sugar over prototypes', freq: 90 }, { topic: 'extends sets up two prototype chains', freq: 80 }, { topic: 'super() must come before this in subclass', freq: 85 }, { topic: 'Private # fields vs TypeScript private', freq: 75 }]} />
+  </div>
+);
+
+export const ProtoInheritLearn = () => (
+  <div style={c.wrap}>
+    <RevealCard color='#a855f740' delay={0}>
+      <div style={c.title('#a855f7')}>🎬 Inheritance vs Composition — The Most Important OOP Decision</div>
+      <p style={c.prose}>Deep inheritance chains are one of the most common sources of unmaintainable code. <strong style={{ color: '#a855f7' }}>Composition — combining small behaviours — produces more flexible, testable code</strong>. This is why React moved from class components to hooks.</p>
+    </RevealCard>
+    <AnalogyCard emoji="🧱" title="LEGO vs Russian dolls" analogy="Inheritance = Russian dolls — each must contain the previous. Change the innermost and it ripples up. Composition = LEGO — snap together exactly the pieces you need. Swap one brick without touching the others." connection="Deep class hierarchy = Russian dolls (fragile). Composing small objects/functions = LEGO (flexible). React hooks are LEGO — combine useFetch + useDebounce without them knowing about each other." />
+    <StorySteps steps={[
+      { title: 'The problem with deep inheritance', color: '#ef4444', desc: 'The Gorilla-Banana problem — you wanted a banana but got the jungle.', code: `class Animal    { breathe() {} }
+class Mammal    extends Animal  { warmBlooded() {} }
+class Pet       extends Mammal  { hasOwner() {} }
+class Dog       extends Pet     { bark() {}   }
+class TrainedDog extends Dog    { doTrick() {} }
+
+// Want to add swimming to SOME dogs?
+// Where does swim() go? Animal? Dog?
+// Every class in the chain is affected.
+
+// You asked for bark() but got:
+// Animal + Mammal + Pet + Dog + all their state
+// = the Gorilla-Banana problem` },
+      { title: 'Composition — mix exactly what you need', color: '#00ff88', desc: 'Small focused behaviours combined via Object.assign.', code: `const canBark  = { bark()  { return this.name + ' barks!'; } };
+const canSwim  = { swim()  { return this.name + ' swims!'; } };
+const canFetch = { fetch() { return this.name + ' fetches!'; } };
+
+function createDog(name, abilities = []) {
+  return Object.assign({ name }, ...abilities);
+}
+
+const lab      = createDog('Rex',  [canBark, canSwim, canFetch]);
+const tiny     = createDog('Tiny', [canBark]);
+
+lab.swim();    // 'Rex swims!'
+tiny.swim;     // undefined — doesn't have it
+
+// Adding new behaviour: just create a new mixin
+const canGuard = { guard() { return this.name + ' guards!'; } };` },
+      { title: 'React: hooks are composition in practice', color: '#4facfe', desc: 'This exact principle drove the move from class components to hooks.', code: `// ❌ Class components — awkward reuse via HOC/render props
+class DataComponent extends React.Component {
+  componentDidMount() { this.fetchData(); }
+  // How do you share fetchData with 10 other components?
+}
+
+// ✅ Hook composition — LEGO model
+function useFetch(url)         { return { data, loading, error }; }
+function useDebounce(val, ms)  { return debouncedValue; }
+function useLocalStorage(key)  { return [value, setValue]; }
+
+function UserList() {
+  const { data }            = useFetch('/api/users');
+  const [filter, setFilter] = useLocalStorage('userFilter');
+  const debounced           = useDebounce(filter, 300);
+  // Each hook independent, composable, testable in isolation
+}` },
+    ]} />
+    <InlinePoll question="'Favour composition over inheritance' means:" options={['Never use classes', 'Build objects by combining small focused behaviours — more flexible, easier to test, avoids fragile base class problem', 'Use React instead of vanilla JS', 'Use mixins only']} correct={1} explanation="Composition: create small single-purpose behaviours and combine them. Inheritance: deep hierarchies where changing a parent breaks children. React hooks are composition in practice." />
+    <CommonMistake mistake="Creating inheritance chains 5+ levels deep because it 'feels organised'." fix="More than 2 levels of inheritance = consider composition. Ask: 'Is this a genuine IS-A relationship or just code sharing?' Code sharing is better done via composition. Dog IS-A Animal is a legitimate 1-level inheritance. TrainedDog extends Dog extends Pet extends Mammal is not." />
+    <DidYouKnow fact="The Gang of Four Design Patterns book (1994) states as its second principle: 'Favor object composition over class inheritance.' Written 20 years before React hooks but it's exactly the philosophy that drove their design. Dan Abramov has cited this principle directly when explaining why hooks replaced class components." color="#a855f7" />
+    <InterviewMeter topics={[{ topic: 'Composition vs inheritance trade-offs', freq: 85 }, { topic: 'Object.assign for mixins', freq: 75 }, { topic: 'How hooks embody composition', freq: 80 }, { topic: 'Fragile base class problem', freq: 70 }]} />
+  </div>
+);
+
+export const ProtoInstanceofLearn = () => (
+  <div style={c.wrap}>
+    <RevealCard color='#a855f740' delay={0}>
+      <div style={c.title('#a855f7')}>🎬 instanceof & Type Checking — The Reliable Way</div>
+      <p style={c.prose}><code>instanceof</code> has surprising edge cases. <strong style={{ color: '#a855f7' }}>Cross-frame failures, Symbol.hasInstance overrides, and why Array.isArray beats instanceof Array</strong> are exactly the nuanced questions that separate senior developers in interviews.</p>
+    </RevealCard>
+    <AnalogyCard emoji="🪪" title="Club membership cards" analogy="instanceof checks if your membership card was issued by a specific club. Usually works fine. But two branches of the same club in different cities issue different cards — branch A's scanner rejects branch B's card even though they're the same club." connection="instanceof = checks prototype chain for Constructor.prototype. Cross-frame = two separate clubs with different cards. Array.isArray = checks the card's built-in stamp, not which club issued it." />
+    <StorySteps steps={[
+      { title: 'How instanceof works', color: '#a855f7', desc: 'Walks the prototype chain looking for Constructor.prototype.', code: `class Animal {}
+class Dog extends Animal {}
+const rex = new Dog();
+
+rex instanceof Dog;    // true  — Dog.prototype in chain
+rex instanceof Animal; // true  — Animal.prototype also in chain
+rex instanceof Object; // true  — Object.prototype at top
+
+// What instanceof actually does:
+function myInstanceof(obj, Ctor) {
+  let proto = Object.getPrototypeOf(obj);
+  while (proto !== null) {
+    if (proto === Ctor.prototype) return true;
+    proto = Object.getPrototypeOf(proto);
+  }
+  return false;
+}` },
+      { title: 'The cross-frame problem', color: '#ef4444', desc: 'Each iframe has its own built-in constructors.', code: `// Array from an iframe:
+const iframeArr = iframe.contentWindow.someArray;
+
+// ❌ Fails — different Array constructor per frame:
+iframeArr instanceof Array; // false
+
+// ✅ Array.isArray works across ALL realms:
+Array.isArray(iframeArr);   // true
+
+// ✅ Object.prototype.toString — universal:
+Object.prototype.toString.call([]);        // '[object Array]'
+Object.prototype.toString.call({});        // '[object Object]'
+Object.prototype.toString.call(new Map()); // '[object Map]'` },
+      { title: 'Symbol.hasInstance — custom instanceof', color: '#4facfe', desc: 'Override how instanceof works for your class.', code: `class EvenNumber {
+  static [Symbol.hasInstance](num) {
+    return typeof num === 'number' && num % 2 === 0;
+  }
+}
+
+4  instanceof EvenNumber; // true
+3  instanceof EvenNumber; // false
+'4' instanceof EvenNumber; // false (not a number)
+
+// More practical use:
+class NonEmptyString {
+  static [Symbol.hasInstance](val) {
+    return typeof val === 'string' && val.length > 0;
+  }
+}
+'hello' instanceof NonEmptyString; // true
+''      instanceof NonEmptyString; // false` },
+    ]} />
+    <InlinePoll question="Most reliable way to check if a value is an array?" options={['value instanceof Array', "typeof value === 'array'", "Array.isArray(value) — works cross-frame, not fooled by prototype changes", 'value.constructor === Array']} correct={2} explanation="Array.isArray() checks [[IsArray]] slot — works cross-frame and even if Array.prototype was replaced. instanceof fails cross-frame. typeof returns 'object'. constructor can be overwritten." />
+    <CommonMistake mistake="Using instanceof to check primitives — 'hello' instanceof String is always false." fix="instanceof only works for objects. Primitives aren't objects. 'hello' instanceof String = false even though 'hello' uses String.prototype methods via autoboxing. For primitives: typeof 'hello' === 'string'." />
+    <DidYouKnow fact="The cross-frame instanceof bug was documented in web forums as early as 2001. It's the reason jQuery's $.isArray() existed before Array.isArray was standardised. Array.isArray was specifically added to ES5 (2009) to solve this exact problem — it's one of the few ES5 additions made purely to fix an existing footgun." color="#a855f7" />
+    <InterviewMeter topics={[{ topic: 'How instanceof walks the prototype chain', freq: 85 }, { topic: 'Cross-frame instanceof failure', freq: 75 }, { topic: 'Array.isArray vs instanceof Array', freq: 90 }, { topic: 'Symbol.hasInstance override', freq: 65 }]} />
+  </div>
+);
+
 // Update the LEARN_COMPONENTS export to include new ones:
+export const DevtoolsElementsLearn = () => (
+  <div style={c.wrap}>
+    <RevealCard color='#06b6d440' delay={0}>
+      <div style={c.title('#06b6d4')}>🎬 Elements Panel — Live DOM & CSS Editing</div>
+      <p style={c.prose}>The Elements panel is the fastest way to understand any page's structure. <strong style={{ color: '#06b6d4' }}>Force states, inspect computed styles, visualise the box model, and edit CSS live</strong> without touching a single file.</p>
+    </RevealCard>
+    <AnalogyCard emoji="🔬" title="A live microscope" analogy="The Elements panel is like a microscope pointed at a living organism — you can see every cell (DOM node), watch it change in real time, poke it to see what happens, and even inject new DNA (CSS rules) and watch the organism respond instantly." connection="DOM tree = organism structure. CSS rules panel = DNA editor. Force state = injecting a stimulus to observe the response. Computed = the actual phenotype (what was expressed)." />
+    <StorySteps steps={[
+      { title: 'Force CSS states without the mouse', color: '#06b6d4', desc: 'Lock :hover, :focus, :active so you can freely edit those CSS rules.', code: `// In the Elements panel:
+// 1. Select the element you want to inspect hover/focus styles on
+// 2. Right-click the element → Force state
+//    OR click the :hov button at top of Styles panel
+// 3. Check :hover, :focus, :active, :focus-within, :focus-visible
+
+// The state stays locked even when your mouse moves away
+// Now you can:
+// - See which CSS rules apply to the hovered state
+// - Edit hover styles directly in the Styles panel
+// - Add new hover rules via the + button
+
+// Pro tip: Force :focus on an input to debug
+// focus-visible and focus ring styles without
+// having to keep the element focused` },
+      { title: 'Styles vs Computed tab', color: '#4facfe', desc: 'Styles shows all rules. Computed shows the final winner.', code: `// Styles tab:
+// - Lists every matching CSS rule in cascade order
+// - Shows which file and line number each rule comes from
+// - Strikethrough = overridden by a higher-specificity rule
+// - Inline styles shown at top
+// - Inherited properties shown at bottom
+// - Click any value to edit it live
+
+// Computed tab:
+// - Final resolved value for EVERY CSS property
+// - Only one value per property (the winner after cascade)
+// - Click any property to jump to the rule that set it
+// - Filter box to search: type 'margin' to see all margins
+
+// When to use which:
+// "Which rule is setting this margin?" → Styles
+// "What is the ACTUAL computed margin?"  → Computed
+// "Why is my font-size not working?"     → Computed to see winner` },
+      { title: 'Box model visualisation', color: '#00ff88', desc: 'See margin, border, padding, and content dimensions at a glance.', code: `// Computed tab → Box Model diagram at the top:
+// Outer box   = margin  (orange)
+// Next box     = border  (yellow)
+// Next box     = padding (green)
+// Inner box    = content (blue) — shows width × height
+
+// Click any value in the box model to edit it
+// Hover any box section — the page highlights that layer
+
+// Elements panel hover (on the PAGE itself):
+// Blue  = content area
+// Green = padding
+// Orange = margin
+// Yellow = border
+
+// To find what's creating unexpected space:
+// 1. Hover elements in the Elements tree
+// 2. Watch the coloured overlay on the page
+// 3. The orange (margin) extends beyond the element border` },
+    ]} />
+    <InlinePoll question="You want to debug a :hover CSS rule. What is the fastest approach?" options={['Hold mouse over element and quickly switch to DevTools', 'Elements panel → select element → :hov button → check :hover — state is locked so you can freely edit CSS', 'Add a class with JS in the Console', 'Take a screenshot while hovering']} correct={1} explanation="Force state locks :hover (or any pseudo-class) permanently so you can inspect and edit without racing the mouse. Click :hov in the Styles panel header, or right-click element → Force state. The state persists until you uncheck it." />
+    <CommonMistake mistake="Editing CSS in DevTools and then losing the changes when you refresh." fix="DevTools edits are temporary — they reset on reload. To persist: copy the changed rule from DevTools Styles panel back to your actual CSS file. Or use Workspaces (Sources → Filesystem) to map DevTools directly to your local files so edits save automatically." />
+    <DidYouKnow fact="Chrome DevTools was created by Pavel Feldman and the V8 team around 2008 as part of the Chrome launch. Before DevTools, web developers used Firebug — a Firefox extension created by Joe Hewitt in 2006 that pioneered live DOM inspection. Firebug was so important that when Firefox adopted built-in DevTools (2011), they hired the Firebug team. Chrome DevTools has since become the gold standard, and Firefox, Safari, and Edge all model their DevTools after it." color="#06b6d4" />
+    <InterviewMeter topics={[{ topic: 'Force state for pseudo-class debugging', freq: 85 }, { topic: 'Styles vs Computed tab difference', freq: 80 }, { topic: 'Box model colour overlay', freq: 75 }, { topic: 'Finding which rule wins in cascade', freq: 80 }]} />
+  </div>
+);
+
+export const DevtoolsConsoleLearn = () => (
+  <div style={c.wrap}>
+    <RevealCard color='#06b6d440' delay={0}>
+      <div style={c.title('#06b6d4')}>🎬 Console API Mastery — Beyond console.log</div>
+      <p style={c.prose}>Most developers use 5% of the Console API. <strong style={{ color: '#06b6d4' }}>console.table, console.group, console.time, logpoints, and the live expression panel</strong> can cut your debugging time in half.</p>
+    </RevealCard>
+    <AnalogyCard emoji="🎛️" title="A pilot's cockpit" analogy="console.log is like looking out the window — you see one thing at a time. The full Console API is the instrument panel — multiple gauges updating in real time, grouped readouts, timing displays, and warning lights that only fire when something goes wrong." connection="console.log = window view. console.table = instrument panel. console.time = stopwatch gauge. console.assert = warning light. Logpoints = instruments without modifying the aircraft." />
+    <StorySteps steps={[
+      { title: 'Console methods you should know', color: '#06b6d4', desc: 'The full toolkit beyond log.', code: `// console.table — renders objects as sortable table
+console.table(users);                    // all columns
+console.table(users, ['name', 'email']); // filter columns
+
+// console.group — collapsible grouped output
+console.group('Auth flow');
+console.log('Step 1: validate');
+console.log('Step 2: hash password');
+console.groupEnd();
+
+// console.time — measure elapsed time
+console.time('fetch users');
+await fetchUsers();
+console.timeEnd('fetch users'); // "fetch users: 142.3ms"
+console.timeLog('fetch users'); // intermediate time without stopping
+
+// console.assert — only logs if condition is FALSE
+console.assert(user.id !== null, 'Expected user.id', user);
+
+// console.trace — prints full call stack at this point
+console.trace('Who called me?');
+
+// console.dir — shows JS object properties, not DOM tree
+console.dir(document.body); // shows all JS properties` },
+      { title: 'Logpoints — the superior console.log', color: '#4facfe', desc: 'Log without modifying or saving any code.', code: `// INSTEAD of adding console.log to your source:
+// function processOrder(order) {
+//   console.log('Processing:', order); // ← adds noise, must remove later
+//   ...
+// }
+
+// USE a Logpoint:
+// 1. Open Sources panel
+// 2. Find the file and line
+// 3. Right-click the line number gutter
+// 4. Click "Add logpoint"
+// 5. Type your expression: 'Processing order:', order
+
+// Benefits:
+// ✓ No source code modification
+// ✓ Not committed to git
+// ✓ Automatically removed when DevTools closes
+// ✓ Supports any JS expression including function calls
+// ✓ Works on production code / minified files` },
+      { title: 'Console utilities — $, $$, monitor()', color: '#00ff88', desc: 'Console shorthand helpers only available in DevTools context.', code: `// $ and $$ — querySelector shortcuts
+$('h1')         // same as document.querySelector('h1')
+$$('.card')     // same as document.querySelectorAll('.card') (returns real array)
+$('button').click(); // click the first button
+
+// $0, $1, $2 — last inspected elements
+// $0 = currently selected element in Elements panel
+// $1 = previously selected, etc.
+$0.style.border = '2px solid red'; // highlight selected element
+
+// monitor() — logs every call to a function
+monitor(fetch);
+// Now every fetch call logs: "function fetch called with arguments: [...]"
+unmonitor(fetch); // stop monitoring
+
+// monitorEvents() — log all events on an element
+monitorEvents($0, 'click');
+monitorEvents(window, ['resize', 'scroll']);
+unmonitorEvents($0);` },
+    ]} />
+    <InlinePoll question="You're debugging a loop that runs 10,000 times and want to break only on iteration 9,500. Best approach?" options={['Click Resume 9,500 times', 'Conditional breakpoint: i === 9500 — only pauses on that specific iteration', 'Add if(i===9500) debugger; to source code', 'console.log every iteration and search']} correct={1} explanation="Right-click the line gutter → Add conditional breakpoint → type: i === 9500. DevTools only pauses when that condition is true, skipping all 9,499 previous iterations. No source code modification needed." />
+    <CommonMistake mistake="Leaving console.log statements in production code — they waste bandwidth, expose internal data, and slow down execution." fix="Use logpoints (no code modification) or a logging library with log levels that can be disabled in production. If you must use console.log during development, use the Find feature to search for console.log before committing. ESLint rule no-console can also catch this automatically." />
+    <DidYouKnow fact="The $ shorthand in the Chrome DevTools Console is actually the Sizzle selector engine (from jQuery) injected into the DevTools context. When jQuery is loaded on the page, $ in the Console uses jQuery's selector. When it's not loaded, Chrome provides its own $ as a shorthand for querySelector. The $$() shorthand was specifically added because querySelectorAll returns a NodeList, not an Array — $$ returns a real Array." color="#06b6d4" />
+    <InterviewMeter topics={[{ topic: 'console.table for object arrays', freq: 80 }, { topic: 'Logpoints vs console.log', freq: 85 }, { topic: 'console.time for quick profiling', freq: 75 }, { topic: '$0 and $$ console shortcuts', freq: 70 }]} />
+  </div>
+);
+
+export const DevtoolsNetworkLearn = () => (
+  <div style={c.wrap}>
+    <RevealCard color='#06b6d440' delay={0}>
+      <div style={c.title('#06b6d4')}>🎬 Network Panel — Diagnosing Every Request</div>
+      <p style={c.prose}>The Network panel tells the complete story of how your page loads. <strong style={{ color: '#06b6d4' }}>Reading the waterfall, identifying bottlenecks, simulating slow connections, and replaying requests</strong> are daily tools for frontend engineers.</p>
+    </RevealCard>
+    <AnalogyCard emoji="🚦" title="Air traffic control" analogy="The Network panel is air traffic control — every aircraft (request) is tracked: when it took off (initiated), how long it taxied (queued), how long the flight was (TTFB + download), and where it came from (initiator). You can see all flights at once or zoom into one." connection="Waterfall = flight timeline. Yellow bar = waiting on the tower (TTFB). Blue bar = passengers boarding (downloading). Red triangle = render blocking = priority flight holding up the runway." />
+    <StorySteps steps={[
+      { title: 'Reading the waterfall', color: '#06b6d4', desc: 'Each colour in the timing bar means something specific.', code: `// Hover any request → Timing tab shows breakdown:
+
+// Queuing (grey):
+// Waiting for a connection slot — HTTP/1.1 max 6 per domain
+// Fix: use HTTP/2 (multiplexing), reduce requests, use CDN
+
+// Stalled (grey):
+// Request ready but waiting for prior request to finish
+// Similar to Queuing — HTTP/1.1 limitation
+
+// DNS Lookup (green):
+// Resolving hostname to IP
+// Fix: <link rel="dns-prefetch" href="//api.example.com">
+
+// Initial connection + SSL (orange):
+// TCP handshake + TLS negotiation
+// Fix: <link rel="preconnect" href="//api.example.com">
+
+// Waiting / TTFB (yellow):  ← most important
+// Server processing time before first byte
+// Good: <200ms. Problem: >600ms
+
+// Content Download (blue):
+// Transferring bytes — proportional to file size
+// Fix: compression, code splitting, smaller responses` },
+      { title: 'Throttling and disabling cache', color: '#4facfe', desc: 'Test under real-world conditions.', code: `// Network throttling:
+// Dropdown: "No throttling" → "Slow 3G" / "Fast 3G" / Custom
+// Simulates: bandwidth limit + latency (Round Trip Time)
+// Use to: see what mobile users on poor connections experience
+
+// Custom throttle profile:
+// ⚙️ Add... → name: "Slow mobile"
+//   Download: 1000 kb/s
+//   Upload:   500 kb/s
+//   Latency:  400 ms
+
+// Disable cache:
+// ☑ Disable cache — prevents all cached responses while DevTools open
+// Use when: testing new deployments, verifying cache headers
+// Note: only active while DevTools is open
+
+// Combined: throttle + disable cache =
+// most accurate simulation of first visit on mobile` },
+      { title: 'Key columns and filters', color: '#00ff88', desc: 'Find what you need fast with filters and extra columns.', code: `// Filter bar (top of Network panel):
+// Type in filter box: domain:api.example.com
+// -domain:cdn.example.com   (exclude)
+// method:POST               (only POST requests)
+// status-code:404           (only 404s)
+// larger-than:100k          (files > 100KB)
+// mime-type:application/json
+
+// Add columns (right-click header row):
+// Priority — High/Medium/Low — High = render blocking
+// Protocol — h2 vs http/1.1
+
+// Size vs Transferred columns:
+// Size:        uncompressed bytes browser parses
+// Transferred: compressed bytes over network
+// If equal → no compression! Should be 60-80% smaller
+
+// Replay a request:
+// Right-click any XHR/Fetch → Replay XHR
+// Resends with same method, headers, body` },
+    ]} />
+    <InlinePoll question="Network tab shows a request with a long yellow bar and short blue bar. What does this mean?" options={['Large file downloading slowly', 'Server is slow (high TTFB) — processing takes long. Fix: server optimisation, caching, CDN, database queries.', 'Render blocking resource', 'DNS lookup taking too long']} correct={1} explanation="Yellow = TTFB (waiting for server response). Blue = content download. Long yellow + short blue = server is the bottleneck, not the file size. The server is taking a long time to generate the response. Fix: cache responses, optimise database queries, use a CDN." />
+    <CommonMistake mistake="Testing performance with DevTools open and cache disabled — gives unrealistic results that don't represent returning visitors." fix="Test with cache ENABLED (realistic returning user) AND disabled (cold first visit). Enable cache, close DevTools, hard refresh, re-open DevTools — this is what a returning user experiences. Disable cache only when specifically testing cache headers or new deployments." />
+    <DidYouKnow fact="The Network panel was one of the original features of Chrome when it launched in 2008. The waterfall view was actually popularised by Steve Souders' YSlow tool for Firefox (2007) based on his research at Yahoo. His book 'High Performance Web Sites' (2007) first described the waterfall chart as the key diagnostic tool for web performance. Google hired Souders specifically to build this capability into Chrome DevTools." color="#06b6d4" />
+    <InterviewMeter topics={[{ topic: 'Waterfall timing bar colour meanings', freq: 85 }, { topic: 'TTFB vs download time distinction', freq: 90 }, { topic: 'Size vs Transferred compression check', freq: 80 }, { topic: 'Throttling for mobile simulation', freq: 75 }]} />
+  </div>
+);
+
+export const DevtoolsPerformanceLearn = () => (
+  <div style={c.wrap}>
+    <RevealCard color='#06b6d440' delay={0}>
+      <div style={c.title('#06b6d4')}>🎬 Performance Panel — Finding Every Millisecond</div>
+      <p style={c.prose}>The Performance panel is the most powerful debugging tool in Chrome DevTools. <strong style={{ color: '#06b6d4' }}>Flame charts, long task identification, layout thrashing, and FPS analysis</strong> are how senior engineers diagnose performance issues that profiling tools miss.</p>
+    </RevealCard>
+    <AnalogyCard emoji="🎵" title="A music score" analogy="The Performance flame chart is like a music score — every instrument (function) is shown on every beat (millisecond). The conductor (you) can see exactly which instrument played too long, which section caused the discord, and precisely when the audience (user) experienced it." connection="Flame chart = score. Width = duration. Yellow = JS scripting. Purple = layout. Red frames = dropped frames (discord). Long Task triangle = an instrument playing 3× too long." />
+    <StorySteps steps={[
+      { title: 'Recording and reading the flame chart', color: '#06b6d4', desc: 'Short focused recordings are easiest to analyse.', code: `// WORKFLOW:
+// 1. Open Performance panel
+// 2. Check CPU throttle: 4x slowdown (simulates mid-range Android)
+// 3. Click Record (⚫)
+// 4. Perform the SPECIFIC slow interaction (one click, one scroll)
+// 5. Click Stop
+// 6. Analyse the 1-5 second recording
+
+// READING THE FLAME CHART:
+// Each row = one level of the call stack
+// Width = time spent (wider = slower)
+// Click any bar = jump to source
+
+// COLOUR CODING:
+// Yellow = JavaScript execution
+// Purple = Layout + Style recalculation
+// Green  = Paint
+// Grey   = System/Composite
+
+// FINDING THE BOTTLENECK:
+// 1. Find the longest yellow block in a Long Task
+// 2. Look at its bottom-most (deepest) function
+// 3. That's your actual bottleneck
+// 4. Everything above = just the call chain` },
+      { title: 'Long Tasks and TBT', color: '#ef4444', desc: 'Tasks over 50ms block input. They show as red triangles.', code: `// Long Task = any JS task > 50ms
+// Shown as: yellow block with red triangle on top-right corner
+// Total Blocking Time (TBT) = sum of excess ms over 50ms per task
+// Example: 3 tasks of 80ms each = (30+30+30) = 90ms TBT
+
+// WHAT CAUSES LONG TASKS:
+// - Heavy JavaScript (complex calculations, large data transforms)
+// - Synchronous network requests (XMLHttpRequest sync)
+// - Layout thrashing (alternating reads/writes)
+// - Large component renders without transitions
+
+// BREAKING UP LONG TASKS:
+// ❌ Single 300ms task — browser frozen
+function processAll(items) {
+  items.forEach(item => heavyProcess(item)); // blocks 300ms
+}
+
+// ✅ Yield between chunks — browser handles input between
+async function processAll(items) {
+  for (let i = 0; i < items.length; i += 50) {
+    items.slice(i, i+50).forEach(item => heavyProcess(item));
+    await scheduler.yield(); // yield to browser
+  }
+}` },
+      { title: 'Detecting layout thrashing', color: '#a855f7', desc: 'Alternating purple/yellow spikes = forced reflow loop.', code: `// Layout thrashing in the flame chart:
+// Alternating: YELLOW (JS) → PURPLE (Layout) → YELLOW → PURPLE
+// Tooltip on purple block: "Forced reflow is a likely performance bottleneck"
+
+// THE CAUSE:
+// Read layout property AFTER a write forces synchronous layout
+// ❌ Bad — read + write alternating:
+elements.forEach(el => {
+  const w = el.offsetWidth;           // READ  → forces layout
+  el.style.width = (w + 1) + 'px';   // WRITE → invalidates layout
+}); // 100 elements = 100 synchronous reflows!
+
+// ✅ Good — batch reads then writes:
+const widths = elements.map(el => el.offsetWidth); // all reads
+elements.forEach((el, i) => {
+  el.style.width = (widths[i] + 1) + 'px';         // all writes
+}); // 1 reflow total` },
+    ]} />
+    <InlinePoll question="Flame chart shows: handleClick (200ms) → processData (190ms) → JSON.parse (180ms). Where should you optimise?" options={['handleClick — it takes the most total time', 'JSON.parse — it is the widest bar at the deepest level. Everything above is just the call chain leading to it.', 'processData — middle of the chain', 'All three equally']} correct={1} explanation="The widest block at the deepest level is always the bottleneck. handleClick and processData are just the path that got there. JSON.parse is doing 180ms of actual work. Fix: parse smaller JSON, stream it, or move parsing to a Web Worker." />
+    <CommonMistake mistake="Recording a 30-second performance profile and trying to analyse all of it." fix="Short focused recordings are dramatically easier to analyse. Record only the specific interaction. 1-5 seconds of data. Then use the timeline zoom (click+drag on the overview) to isolate the exact moment of the slow interaction. More data = more noise = harder to find the issue." />
+    <DidYouKnow fact="The flame chart visualisation was invented by Brendan Gregg at Netflix in 2011 for profiling Linux kernel performance. He noticed that visualising folded call stacks as rectangular bars looked like flames — the name stuck. Chrome DevTools adopted the format in 2013. Today it is the standard profiling visualisation across Chrome, Node.js, Firefox, Xcode Instruments, and most other profiling tools." color="#06b6d4" />
+    <InterviewMeter topics={[{ topic: 'Flame chart reading — width = time, bottom = bottleneck', freq: 90 }, { topic: 'Long task identification (>50ms)', freq: 85 }, { topic: 'Layout thrashing detection', freq: 80 }, { topic: 'Yielding to break up long tasks', freq: 75 }]} />
+  </div>
+);
+
+export const DevtoolsMemoryLearn = () => (
+  <div style={c.wrap}>
+    <RevealCard color='#06b6d440' delay={0}>
+      <div style={c.title('#06b6d4')}>🎬 Memory Panel — Hunting Memory Leaks</div>
+      <p style={c.prose}>Memory leaks cause apps to slow down and crash over time. <strong style={{ color: '#06b6d4' }}>Heap snapshots, the allocation timeline, and Performance Monitor</strong> are the toolkit for finding exactly what is leaking and why.</p>
+    </RevealCard>
+    <AnalogyCard emoji="🔍" title="A water leak investigation" analogy="Detecting a memory leak is like finding a water leak: Performance Monitor is the water bill (tells you there IS a leak). Heap snapshots are the moisture meter (tells you WHERE the leak is). The retainer chain is the pipe map (shows you WHY it is leaking)." connection="Performance Monitor = water bill (confirms leak). Heap snapshot comparison = moisture meter (locates it). Retainer chain = pipe diagram (explains cause)." />
+    <StorySteps steps={[
+      { title: 'Step 1 — confirm leak with Performance Monitor', color: '#06b6d4', desc: 'Live heap size chart. A continuous upward slope confirms a leak.', code: `// Open Performance Monitor:
+// DevTools → More Tools (⋮) → Performance monitor
+
+// Watch these metrics:
+// - JS heap size (main one for memory leaks)
+// - DOM Nodes (growing = detached nodes)
+// - Event Listeners (growing = unremoved listeners)
+
+// HEALTHY pattern — sawtooth:
+// Heap: ████▁████▁████▁  (grows then GC drops it)
+
+// LEAKING pattern — upward slope:
+// Heap: ████████████████ (never fully drops)
+
+// TEST:
+// 1. Open Performance Monitor
+// 2. Perform the suspected action 10-20 times
+//    (open/close modal, navigate back/forth, etc.)
+// 3. Watch JS heap size
+// 4. Upward trend that doesn't return to baseline = leak confirmed` },
+      { title: 'Step 2 — find it with Heap Snapshots', color: '#4facfe', desc: 'Compare two snapshots to see what grew.', code: `// Memory panel → Heap snapshot → workflow:
+
+// 1. Take Snapshot 1 (baseline — before the action)
+// 2. Perform the leaking action 10+ times
+// 3. Take Snapshot 2
+// 4. In Snapshot 2 dropdown: switch to "Comparison" view
+// 5. Sort by "#Delta" column (objects added minus removed)
+
+// READING THE TABLE:
+// Constructor  | #New | #Deleted | #Delta | Alloc Size
+// MyComponent  |  10  |    0     |  +10   |  2.4 MB
+// ↑ 10 created, none GC'd = LEAK
+
+// 6. Click the leaked class to expand
+// 7. See individual instances with their retained size
+// 8. Click an instance → Retainers panel appears
+// 9. Retainers show: which variable is holding the reference
+
+// Common leak culprits in Comparison view:
+// - Your component names with positive delta
+// - "(closure)" with large retained size
+// - "Detached HTMLElement" = DOM node leak` },
+      { title: 'Common leaks and their fixes', color: '#00ff88', desc: 'The three patterns responsible for 90% of React memory leaks.', code: `// LEAK 1: Event listener without cleanup
+useEffect(() => {
+  window.addEventListener('resize', handler);
+  // ❌ No cleanup — handler holds component reference
+}, []);
+// ✅ Fix:
+useEffect(() => {
+  window.addEventListener('resize', handler);
+  return () => window.removeEventListener('resize', handler);
+}, []);
+
+// LEAK 2: setInterval without cleanup
+useEffect(() => {
+  const id = setInterval(tick, 1000);
+  // ❌ Interval keeps running after unmount
+}, []);
+// ✅ Fix:
+useEffect(() => {
+  const id = setInterval(tick, 1000);
+  return () => clearInterval(id);
+}, []);
+
+// LEAK 3: Fetch without AbortController
+useEffect(() => {
+  fetch(url).then(r => r.json()).then(setData);
+  // ❌ setState called after unmount
+}, [url]);
+// ✅ Fix:
+useEffect(() => {
+  const ctrl = new AbortController();
+  fetch(url, { signal: ctrl.signal })
+    .then(r => r.json()).then(setData)
+    .catch(e => { if (e.name !== 'AbortError') setError(e); });
+  return () => ctrl.abort();
+}, [url]);` },
+    ]} />
+    <InlinePoll question="Heap snapshot Comparison view shows: EventListener +50, #Delta +50. What is the cause?" options={['Too many click handlers on buttons', 'Event listeners are being added but never removed — likely in a useEffect without cleanup or a loop that adds listeners repeatedly', 'Normal browser behaviour', 'Third-party library issue only']} correct={1} explanation="+50 EventListener delta means 50 listeners were added but not removed between snapshots. Click the row to see which element they are on, then check useEffect cleanups and any code that calls addEventListener. Every addEventListener must have a corresponding removeEventListener in cleanup." />
+    <CommonMistake mistake="Taking a heap snapshot immediately after an interaction — GC may not have run yet, making objects appear leaked when they are actually collectable." fix="Before taking the final snapshot, click the garbage-can icon (Force GC) in the Memory panel or DevTools toolbar. This runs GC before the snapshot so you only see objects that truly cannot be collected, not objects waiting for the next GC cycle." />
+    <DidYouKnow fact="V8 (Chrome's JS engine) uses a generational garbage collector: most new objects go into 'young generation' (collected frequently, fast). Objects that survive multiple collections move to 'old generation' (collected less often). Memory leaks are almost always old-generation objects that should have died but have a reference keeping them alive. Heap snapshots show old-generation objects — which is exactly why they reveal leaks." color="#06b6d4" />
+    <InterviewMeter topics={[{ topic: 'Performance Monitor for leak detection', freq: 85 }, { topic: 'Heap snapshot comparison workflow', freq: 90 }, { topic: 'useEffect cleanup patterns', freq: 90 }, { topic: 'Force GC before snapshot', freq: 70 }]} />
+  </div>
+);
+
+export const DevtoolsSourcesLearn = () => (
+  <div style={c.wrap}>
+    <RevealCard color='#06b6d440' delay={0}>
+      <div style={c.title('#06b6d4')}>🎬 Sources Panel — Breakpoints & Debugging</div>
+      <p style={c.prose}>The Sources panel is a full debugger inside your browser. <strong style={{ color: '#06b6d4' }}>Conditional breakpoints, logpoints, watch expressions, and the call stack</strong> let you pause execution and inspect any state at any moment.</p>
+    </RevealCard>
+    <AnalogyCard emoji="⏸️" title="A movie pause button with X-ray vision" analogy="Normal code runs like a movie — too fast to see individual frames. The debugger is a pause button that freezes the film at any frame. Conditional breakpoints are a smart pause that only stops on specific scenes. Logpoints are subtitles added to the film without cutting and re-editing it." connection="Breakpoint = pause button. Conditional breakpoint = pause only on scene matching condition. Logpoint = subtitle overlay. Watch expressions = live instrument panels. Call stack = storyboard showing how we got here." />
+    <StorySteps steps={[
+      { title: 'Breakpoint types', color: '#06b6d4', desc: 'Four types — each for a different debugging scenario.', code: `// 1. REGULAR BREAKPOINT
+// Click the line number gutter → blue marker appears
+// Pauses every time that line is reached
+// Best for: specific line you always want to inspect
+
+// 2. CONDITIONAL BREAKPOINT
+// Right-click gutter → "Add conditional breakpoint"
+// Enter JS expression: userId === '12345'
+//                  or: items.length > 100
+//                  or: response.status !== 200
+// Only pauses when expression is TRUE
+// Best for: loops, event handlers with specific conditions
+
+// 3. LOGPOINT
+// Right-click gutter → "Add logpoint"
+// Enter expression: 'User data:', user, 'at step', step
+// Logs to Console WITHOUT pausing or modifying source
+// Best for: tracing values without stopping execution
+
+// 4. DOM BREAKPOINT (in Elements panel)
+// Right-click element → Break on → subtree modifications
+// Pauses when the DOM element is modified
+// Best for: finding which code is changing a DOM element` },
+      { title: 'The debugger controls and scope', color: '#4facfe', desc: 'Navigate paused execution and inspect all variables.', code: `// When paused, the toolbar buttons do:
+// ▶  Resume (F8)        — continue until next breakpoint
+// ↷  Step over (F10)   — run next line, don't enter functions
+// ↘  Step into (F11)   — enter the called function
+// ↗  Step out (Shift+F11) — finish current function, return to caller
+// ↺  Step (F9)         — one statement at a time
+
+// SCOPE panel (right side) shows:
+// Local  — variables in current function
+// Closure — variables from outer scopes
+// Module  — module-level variables
+// Global  — window properties
+
+// WATCH panel — add any expression to monitor:
+// + button → type: user.permissions.length
+//          → type: Date.now() - startTime
+// Updates on every pause
+
+// CALL STACK panel:
+// Shows every function call that led here
+// Click any frame to jump to that context
+// Scope panel updates to show that frame's variables` },
+      { title: 'Debugging production / minified code', color: '#00ff88', desc: 'Pretty-print and source maps make production debugging possible.', code: `// Pretty-print minified code:
+// Sources panel → open minified file → click {} at bottom-left
+// Reformats code with proper indentation
+// Breakpoints work on the formatted version
+
+// Source maps (the right way):
+// If your build generates source maps and uploads to Sentry:
+// Original TypeScript/JSX source appears in Sources panel
+// Breakpoints work on the original files
+// Even on production builds
+
+// Webpack: devtool: 'source-map'
+// Vite:    build: { sourcemap: true }
+
+// IGNORE LIST — skip noisy third-party code:
+// Right-click any file in Sources tree
+// → "Add script to ignore list"
+// Debugger skips those files when stepping
+// Also: Settings → Ignore List → add pattern
+// e.g., /node_modules/ to skip all npm packages
+
+// Never pause here:
+// When "pause on exceptions" is on,
+// right-click a noisy location → "Never pause here"` },
+    ]} />
+    <InlinePoll question="A loop runs 5,000 times. You want to pause at iteration 4,999. Most efficient approach?" options={['Click Resume 4,999 times', 'Conditional breakpoint: i === 4999 — DevTools skips all previous iterations', 'Add if(i===4999) debugger; to source', 'Use console.log and ctrl+f through 5000 logs']} correct={1} explanation="Right-click line gutter → Add conditional breakpoint → i === 4999. DevTools evaluates the condition silently on each pass and only pauses when true. Zero clicks, no source modification, no noise. Conditional breakpoints are the single biggest productivity multiplier in the debugger." />
+    <CommonMistake mistake="Using debugger; statements in source code and committing them to git." fix="Logpoints do exactly what debugger; does (minus the pause) without touching source code. For actual pause-and-inspect scenarios, use DevTools breakpoints set in the Sources panel — they are per-session, not committed. If you must use debugger;, add an ESLint rule (no-debugger) to catch it before commit." />
+    <DidYouKnow fact="The JavaScript debugger statement (the word 'debugger' in code) was in the original ECMAScript 1.0 spec in 1997 — before any browser had developer tools. It was essentially a no-op for years until browsers started building debuggers. Chrome DevTools (2008) was the first to implement it properly as a programmatic breakpoint. Today it is the only JS keyword that has zero effect when dev tools are closed." color="#06b6d4" />
+    <InterviewMeter topics={[{ topic: 'Conditional breakpoints for loops', freq: 90 }, { topic: 'Logpoints vs console.log vs debugger', freq: 85 }, { topic: 'Call stack navigation', freq: 80 }, { topic: 'Debugging minified code with source maps', freq: 75 }]} />
+  </div>
+);
+
 export const LEARN_COMPONENTS = {
+  // Prototypes
+  'proto-chain':      ProtoChainLearn,
+  'proto-create':     ProtoCreateLearn,
+  'proto-class':      ProtoClassLearn,
+  'proto-inherit':    ProtoInheritLearn,
+  'proto-instanceof': ProtoInstanceofLearn,
+  'devtools-elements': DevtoolsElementsLearn,
+  'devtools-console': DevtoolsConsoleLearn,
+  'devtools-network': DevtoolsNetworkLearn,
+  'devtools-performance': DevtoolsPerformanceLearn,
+  'devtools-memory': DevtoolsMemoryLearn,
+  'devtools-sources': DevtoolsSourcesLearn,
   'event-loop': EventLoopLearn,
   'closure-def': ClosureLearn,
   'hoisting': HoistingLearn,

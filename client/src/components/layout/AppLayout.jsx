@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useProgress } from '../../context/ProgressContext';
-import { TOPICS, LEARNABLE_IDS } from '../../data/courseData';
+import { TOPICS, LEARNABLE_IDS } from 'reactdevmastery-content/data';
 import toast from 'react-hot-toast';
 import styles from './Layout.module.css';
 

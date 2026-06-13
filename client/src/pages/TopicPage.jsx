@@ -1,43 +1,42 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useProgress } from '../context/ProgressContext';
-import { CONCEPTS, QUIZZES, CONTENT } from '../data/courseData';
-import { LEARN_COMPONENTS } from '../components/ui/ConceptLearn';
-import { CHALLENGES } from '../data/challenges';
+import { CONCEPTS, QUIZZES, CONTENT, CHALLENGES } from 'reactdevmastery-content/data';
+import { LEARN_COMPONENTS, VISUALIZERS } from 'reactdevmastery-content/components';
 import api from '../utils/api';
 import styles from './TopicPage.module.css';
-import {
-  EventLoopVisualizer, HoistingVisualizer, ClosureVisualizer,
-  ThisVisualizer, CoercionVisualizer, PromiseVisualizer,
-  AsyncAwaitVisualizer, FiberVisualizer, VirtualDOMVisualizer,
-  UseEffectVisualizer, CWVVisualizer, CodeSplittingVisualizer,
-  ReflowVisualizer, XSSVisualizer, AuthFlowVisualizer,
-  RenderingPatternsVisualizer, ScopeChainVisualizer,
-  NetworkVisualizer, MemoryVisualizer, DesignPatternsVisualizer,
-} from '../components/ui/ConceptVisualizer';
+// import {
+//   EventLoopVisualizer, HoistingVisualizer, ClosureVisualizer,
+//   ThisVisualizer, CoercionVisualizer, PromiseVisualizer,
+//   AsyncAwaitVisualizer, FiberVisualizer, VirtualDOMVisualizer,
+//   UseEffectVisualizer, CWVVisualizer, CodeSplittingVisualizer,
+//   ReflowVisualizer, XSSVisualizer, AuthFlowVisualizer,
+//   RenderingPatternsVisualizer, ScopeChainVisualizer,
+//   NetworkVisualizer, MemoryVisualizer, DesignPatternsVisualizer,
+// } from '../components/ui/ConceptVisualizer';
 
-const VISUALIZERS = {
-  'event-loop':          EventLoopVisualizer,
-  'hoisting':            HoistingVisualizer,
-  'closure-def':         ClosureVisualizer,
-  'this-keyword':        ThisVisualizer,
-  'coercion':            CoercionVisualizer,
-  'promise-internals':   PromiseVisualizer,
-  'async-await':         AsyncAwaitVisualizer,
-  'fiber':               FiberVisualizer,
-  'virtual-dom':         VirtualDOMVisualizer,
-  'useeffect-deep':      UseEffectVisualizer,
-  'cwv':                 CWVVisualizer,
-  'code-splitting':      CodeSplittingVisualizer,
-  'reflow-repaint':      ReflowVisualizer,
-  'xss':                 XSSVisualizer,
-  'auth-patterns':       AuthFlowVisualizer,
-  'rendering-patterns':  RenderingPatternsVisualizer,
-  'scope-chain':         ScopeChainVisualizer,
-  'http2-3':             NetworkVisualizer,
-  'memory':              MemoryVisualizer,
-  'patterns':            DesignPatternsVisualizer,
-};
+// const VISUALIZERS = {
+//   'event-loop':          EventLoopVisualizer,
+//   'hoisting':            HoistingVisualizer,
+//   'closure-def':         ClosureVisualizer,
+//   'this-keyword':        ThisVisualizer,
+//   'coercion':            CoercionVisualizer,
+//   'promise-internals':   PromiseVisualizer,
+//   'async-await':         AsyncAwaitVisualizer,
+//   'fiber':               FiberVisualizer,
+//   'virtual-dom':         VirtualDOMVisualizer,
+//   'useeffect-deep':      UseEffectVisualizer,
+//   'cwv':                 CWVVisualizer,
+//   'code-splitting':      CodeSplittingVisualizer,
+//   'reflow-repaint':      ReflowVisualizer,
+//   'xss':                 XSSVisualizer,
+//   'auth-patterns':       AuthFlowVisualizer,
+//   'rendering-patterns':  RenderingPatternsVisualizer,
+//   'scope-chain':         ScopeChainVisualizer,
+//   'http2-3':             NetworkVisualizer,
+//   'memory':              MemoryVisualizer,
+//   'patterns':            DesignPatternsVisualizer,
+// };
 
 // ── Topic list ─────────────────────────────────────────────────────────
 export const TopicPage = () => {

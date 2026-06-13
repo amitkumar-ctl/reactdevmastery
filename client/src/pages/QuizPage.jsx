@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useProgress } from '../context/ProgressContext';
-import { QUIZZES, CONCEPTS } from '../data/courseData';
+import { QUIZZES, CONCEPTS } from 'reactdevmastery-content/data';
 import styles from './TopicPage.module.css';
 
 const QuizPage = () => {

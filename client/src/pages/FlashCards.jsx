@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useProgress } from '../context/ProgressContext';
-import { FLASHCARDS } from '../data/courseData';
+import { FLASHCARDS } from 'reactdevmastery-content/data';
 import styles from './FlashCards.module.css';
 
 const FlashCards = () => {

@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useProgress } from '../context/ProgressContext';
-import { CONCEPTS, LEARNABLE_IDS } from '../data/courseData';
+import { CONCEPTS, LEARNABLE_IDS } from 'reactdevmastery-content/data';
 import styles from './Dashboard.module.css';
 
 const Dashboard = () => {
@@ -30,12 +30,45 @@ const Dashboard = () => {
 
   // Roadmap
   const roadmap = [
-    { id: 'js-core', label: 'JS Fundamentals', sub: 'Closures, Scope, this, Coercion' },
-    { id: 'async', label: 'Async & Event Loop', sub: 'Promises, async/await, Web Workers' },
-    { id: 'react-core', label: 'React Internals', sub: 'Fiber, Reconciliation, Concurrent Mode' },
-    { id: 'perf', label: 'Performance', sub: 'Core Web Vitals, Code Splitting, LCP' },
-    { id: 'security', label: 'Security', sub: 'XSS, CSRF, Auth Patterns, CSP' },
-    { id: 'system-design', label: 'System Design', sub: 'Architecture, Micro-frontends, Patterns' },
+    // ── JavaScript ──────────────────────────────────────────
+    { id: 'js-core',      label: 'JS Internals',        sub: 'Event Loop, Hoisting, Coercion, Memory',         section: 'JAVASCRIPT' },
+    { id: 'closures',     label: 'Closures & Scope',    sub: 'Closures, Scope Chain, Module Pattern',           section: null },
+    { id: 'prototypes',   label: 'Prototypes & OOP',    sub: 'Prototype Chain, Classes, Composition',           section: null },
+    { id: 'async',        label: 'Async & Promises',    sub: 'Promises, async/await, Observables, Workers',     section: null },
+    { id: 'js-advanced',  label: 'Advanced JS',         sub: 'Proxy, WeakRef, Generators, Race Conditions',     section: null },
+    { id: 'ts',           label: 'TypeScript',          sub: 'Generics, Utility Types, Guards, Mapped Types',   section: null },
+    // ── React ───────────────────────────────────────────────
+    { id: 'react-core',       label: 'React Internals',     sub: 'Fiber, Virtual DOM, Render Cycle, Context',       section: 'REACT' },
+    { id: 'hooks',            label: 'Hooks & State',       sub: 'useEffect, Custom Hooks, State Architecture',      section: null },
+    { id: 'react-patterns',   label: 'React Patterns',      sub: 'HOC, Compound Components, Portals, Suspense',     section: null },
+    { id: 'react-performance', label: 'React Performance',  sub: 'memo, Batching, Virtualization, Concurrent',      section: null },
+    { id: 'nextjs',           label: 'Next.js',             sub: 'App Router, RSC, Caching, Server Actions',         section: null },
+    // ── Advanced ────────────────────────────────────────────
+    { id: 'perf',     label: 'Performance & CWV',  sub: 'LCP, INP, CLS, Code Splitting, Memoization',   section: 'ADVANCED' },
+    { id: 'network',  label: 'Network & HTTP',     sub: 'HTTP/2, Caching, WebSockets, SSE',              section: null },
+    { id: 'security', label: 'Security',           sub: 'XSS, CSRF, Auth Patterns, JWT, CSP',            section: null },
+    { id: 'browser',  label: 'Browser Internals',  sub: 'Rendering Pipeline, Reflow, Storage APIs',      section: null },
+    { id: 'devtools', label: 'DevTools & Debugging', sub: 'Flame Charts, Memory Leaks, Breakpoints',     section: null },
+    // ── CSS & UI ────────────────────────────────────────────
+    { id: 'css-adv',    label: 'CSS Architecture',   sub: 'Specificity, Grid, BEM, Container Queries',    section: 'CSS & UI' },
+    { id: 'animations', label: 'Animations & GPU',   sub: 'GPU Layers, will-change, Framer Motion, CLS',  section: null },
+    { id: 'a11y',       label: 'Accessibility',      sub: 'ARIA, Keyboard Nav, Screen Readers, WCAG',     section: null },
+    { id: 'html-q',     label: 'HTML Deep Dive',     sub: 'Semantic HTML, async/defer, Shadow DOM',       section: null },
+    // ── Architecture ────────────────────────────────────────
+    { id: 'system-design', label: 'System Design',    sub: 'Scalable Components, Micro-frontends, Design Systems', section: 'ARCHITECTURE' },
+    { id: 'patterns',      label: 'Design Patterns',  sub: 'Singleton, Observer, Strategy, Command, MVC',          section: null },
+    { id: 'state-mgmt',    label: 'State Management', sub: 'Redux, Zustand, React Query, Optimistic UI',           section: null },
+    { id: 'testing',       label: 'Testing Strategy', sub: 'Testing Pyramid, RTL, Mocking, MSW',                   section: null },
+    { id: 'bundlers',      label: 'Build Tools',      sub: 'Webpack, Vite, Rollup, Babel, CI/CD',                  section: null },
+    // ── Interview Rounds ────────────────────────────────────
+    { id: 'js-interview',            label: 'JS Interview Round',          sub: 'var/let/const, Closures, Event Loop, Prototypes', section: 'INTERVIEW' },
+    { id: 'react-interview',         label: 'React Interview Round',       sub: 'Fiber, useEffect, Re-renders, Concurrent',        section: null },
+    { id: 'system-design-interview', label: 'System Design Round',         sub: 'Architecture, APIs, Auth, Real-time, Monitoring', section: null },
+    { id: 'machine-coding',          label: 'Machine Coding Round',        sub: 'Debounce, Autocomplete, Virtual List, Kanban',    section: null },
+    { id: 'debugging-round',         label: 'Debugging Round',             sub: 'Re-renders, Memory Leaks, Hydration, Closures',   section: null },
+    { id: 'perf-interview',          label: 'Performance Round',           sub: 'CWV, Bundle Size, Caching, Rendering Strategy',   section: null },
+    { id: 'security-interview',      label: 'Security Round',              sub: 'XSS, CSRF, JWT, CORS, CSP, OAuth',                section: null },
+    { id: 'rapid-fire',              label: 'Rapid Fire (50 Qs)',          sub: 'Quick-fire answers for every core concept',        section: null },
   ];
 
   return (
@@ -88,11 +121,21 @@ const Dashboard = () => {
             <div className={styles.panel} style={{ marginTop: 16 }}>
               <div className={styles.sectionTitle}>Learning Roadmap</div>
               {roadmap.map((r, i, arr) => {
-                const done = completedTopics.includes(r.id);
-                const prev = arr.slice(0, i).every(x => completedTopics.includes(x.id));
-                const current = !done && prev;
-                return (
-                  <div key={r.id} className={styles.roadmapItem} onClick={() => navigate(`/${r.id}`)}>
+              const done    = completedTopics.includes(r.id);
+              const prev    = arr.slice(0, i).every(x => completedTopics.includes(x.id));
+              const current = !done && prev;
+              return (
+                <React.Fragment key={r.id}>
+                  {r.section && (
+                    <div style={{
+                      fontSize: 9, fontWeight: 700, letterSpacing: 2,
+                      color: '#374151', marginTop: i === 0 ? 0 : 12,
+                      marginBottom: 4, paddingLeft: 28, textTransform: 'uppercase',
+                    }}>
+                      {r.section}
+                    </div>
+                  )}
+                  <div className={styles.roadmapItem} onClick={() => navigate(`/${r.id}`)}>
                     <div className={styles.roadmapLine}>
                       <div className={styles.roadmapDot} style={{
                         background: done ? '#00ff88' : current ? '#4facfe' : '#374151',
@@ -109,8 +152,9 @@ const Dashboard = () => {
                       <div className={styles.roadmapSub}>{r.sub}</div>
                     </div>
                   </div>
-                );
-              })}
+                </React.Fragment>
+              );
+            })}
             </div>
           </div>
 

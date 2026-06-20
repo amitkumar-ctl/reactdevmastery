@@ -1,42 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useProgress } from '../context/ProgressContext';
-import { CONCEPTS, QUIZZES, CONTENT, CHALLENGES } from 'reactdevmastery-content/data';
+import { CONCEPTS, QUIZZES, CONTENT, CHALLENGES, FAQS } from 'reactdevmastery-content/data';
 import { LEARN_COMPONENTS, VISUALIZERS } from 'reactdevmastery-content/components';
-import api from '../utils/api';
 import styles from './TopicPage.module.css';
-// import {
-//   EventLoopVisualizer, HoistingVisualizer, ClosureVisualizer,
-//   ThisVisualizer, CoercionVisualizer, PromiseVisualizer,
-//   AsyncAwaitVisualizer, FiberVisualizer, VirtualDOMVisualizer,
-//   UseEffectVisualizer, CWVVisualizer, CodeSplittingVisualizer,
-//   ReflowVisualizer, XSSVisualizer, AuthFlowVisualizer,
-//   RenderingPatternsVisualizer, ScopeChainVisualizer,
-//   NetworkVisualizer, MemoryVisualizer, DesignPatternsVisualizer,
-// } from '../components/ui/ConceptVisualizer';
-
-// const VISUALIZERS = {
-//   'event-loop':          EventLoopVisualizer,
-//   'hoisting':            HoistingVisualizer,
-//   'closure-def':         ClosureVisualizer,
-//   'this-keyword':        ThisVisualizer,
-//   'coercion':            CoercionVisualizer,
-//   'promise-internals':   PromiseVisualizer,
-//   'async-await':         AsyncAwaitVisualizer,
-//   'fiber':               FiberVisualizer,
-//   'virtual-dom':         VirtualDOMVisualizer,
-//   'useeffect-deep':      UseEffectVisualizer,
-//   'cwv':                 CWVVisualizer,
-//   'code-splitting':      CodeSplittingVisualizer,
-//   'reflow-repaint':      ReflowVisualizer,
-//   'xss':                 XSSVisualizer,
-//   'auth-patterns':       AuthFlowVisualizer,
-//   'rendering-patterns':  RenderingPatternsVisualizer,
-//   'scope-chain':         ScopeChainVisualizer,
-//   'http2-3':             NetworkVisualizer,
-//   'memory':              MemoryVisualizer,
-//   'patterns':            DesignPatternsVisualizer,
-// };
 
 // ── Topic list ─────────────────────────────────────────────────────────
 export const TopicPage = () => {
@@ -127,9 +94,9 @@ export const ConceptPage = () => {
       </div>
 
       <div className={styles.tabBar}>
-        {['learn', 'quiz', 'chat'].map(t => (
+        {['learn', 'quiz', 'faq'].map(t => (
           <button key={t} className={`${styles.tabBtn} ${tab === t ? styles.tabActive : ''}`} onClick={() => setTab(t)}>
-            {t === 'learn' ? '📖 Learn' : t === 'quiz' ? '🎯 Quiz' : '💬 Ask AI'}
+            {t === 'learn' ? '📖 Learn' : t === 'quiz' ? '🎯 Quiz' : '💬 FAQ'}
           </button>
         ))}
       </div>
@@ -137,8 +104,7 @@ export const ConceptPage = () => {
       <div className={styles.content}>
         {tab === 'learn' && <LearnTab item={item} topicId={topicId} />}
         {tab === 'quiz' && <QuizTab item={item} topicId={topicId} onAnswer={recordQuiz} onCorrect={() => markConceptDone(item.id, topicId, allIds)} />}
-        {/* {tab === 'challenge' && <ChallengeTab item={item} />} */}
-        {tab === 'chat' && <ChatTab item={item} />}
+        {tab === 'faq' && <FAQTab item={item} />}
       </div>
     </div>
   );
@@ -149,33 +115,30 @@ const LearnTab = ({ item, topicId }) => {
   const VisComponent = VISUALIZERS[item.id];
   const LearnComponent = LEARN_COMPONENTS[item.id];
   const content = CONTENT[item.id];
-  const [showAI, setShowAI] = useState(false);
-  const [aiContent, setAiContent] = useState(null);
-  const [loadingAI, setLoadingAI] = useState(false);
+  const faqs = FAQS[item.id];
 
-  const fetchAI = async () => {
-    setLoadingAI(true);
-    setShowAI(true);
-    try {
-      const [r1, r2] = await Promise.all([
-        api.post('/ai/chat', { messages: [{ role: 'user', content: `Explain "${item.title}" for a senior frontend engineer. Core concept, production relevance, misconceptions. Under 200 words, plain text.` }] }),
-        api.post('/ai/chat', { messages: [{ role: 'user', content: `3 interview tips for "${item.title}":\nTIP 1:\nTRAP:\nBONUS:` }] }),
-      ]);
-      setAiContent({ explanation: r1.data.content[0].text, tips: r2.data.content[0].text });
-    } catch (e) {
-      alert('AI error: ' + e.message);
-    } finally {
-      setLoadingAI(false);
-    }
+  const docLinks = {
+    'event-loop':        { label: 'MDN — Event Loop', url: 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Event_loop' },
+    'closure-def':       { label: 'MDN — Closures', url: 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Closures' },
+    'hoisting':          { label: 'MDN — Hoisting', url: 'https://developer.mozilla.org/en-US/docs/Glossary/Hoisting' },
+    'this-keyword':      { label: 'MDN — this', url: 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/this' },
+    'promise-internals': { label: 'MDN — Promise', url: 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise' },
+    'async-await':       { label: 'MDN — async function', url: 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function' },
+    'scope-chain':       { label: 'MDN — Scope', url: 'https://developer.mozilla.org/en-US/docs/Glossary/Scope' },
+    'fiber':             { label: 'React Docs — Reconciliation', url: 'https://react.dev/learn/preserving-and-resetting-state' },
+    'useeffect-deep':    { label: 'React Docs — useEffect', url: 'https://react.dev/reference/react/useEffect' },
+    'cwv':               { label: 'web.dev — Core Web Vitals', url: 'https://web.dev/vitals/' },
+    'xss':               { label: 'MDN — XSS', url: 'https://developer.mozilla.org/en-US/docs/Glossary/Cross-site_scripting' },
+    'memory':            { label: 'MDN — Memory Management', url: 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Memory_management' },
   };
+
+  const doc = docLinks[item.id];
 
   return (
     <div className={styles.lessonWrap}>
 
-      {/* Interactive animated visualizer */}
       {VisComponent && <VisComponent />}
 
-      {/* Rich interactive learn component */}
       {LearnComponent
         ? <LearnComponent />
         : content
@@ -203,23 +166,104 @@ const LearnTab = ({ item, topicId }) => {
           : null
       }
 
-      {/* Optional live AI section */}
-      <div className={styles.panel} style={{ borderColor: '#2a3f5f' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div className={styles.sectionTitle} style={{ marginBottom: 0 }}>🤖 Ask AI for a Fresh Explanation</div>
-          <button className={styles.btn} onClick={fetchAI} disabled={loadingAI}>
-            {loadingAI ? '⏳ Loading...' : showAI ? '🔄 Regenerate' : 'Generate'}
-          </button>
-        </div>
-        {showAI && aiContent && (
-          <div style={{ marginTop: 14 }}>
-            <pre className={styles.explainBox} style={{ marginBottom: 12 }}>{aiContent.explanation}</pre>
-            <pre className={styles.explainBox}>{aiContent.tips}</pre>
+      {(faqs || doc) && (
+        <div className={styles.panel} style={{ borderColor: '#1e3a5f', background: '#060d1a' }}>
+          <div className={styles.sectionTitle} style={{ color: '#4facfe' }}>🤔 Still Confused?</div>
+          <p style={{ fontSize: 12, color: '#6b7280', margin: '0 0 12px' }}>
+            Check the FAQ tab for common questions, or read the official docs below.
+          </p>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            {doc && (
+              <a href={doc.url} target="_blank" rel="noopener noreferrer"
+                style={{ fontSize: 12, color: '#4facfe', padding: '6px 12px', border: '1px solid #1e3a5f', borderRadius: 6, textDecoration: 'none' }}>
+                📖 {doc.label} ↗
+              </a>
+            )}
+            <a href="https://javascript.info" target="_blank" rel="noopener noreferrer"
+              style={{ fontSize: 12, color: '#9ca3af', padding: '6px 12px', border: '1px solid #1e2d40', borderRadius: 6, textDecoration: 'none' }}>
+              📚 javascript.info ↗
+            </a>
           </div>
-        )}
-        {showAI && loadingAI && <div style={{ color: '#9ca3af', fontSize: 12, marginTop: 10 }}>Generating personalized explanation...</div>}
+        </div>
+      )}
+
+    </div>
+  );
+};
+
+// ── FAQ Tab ────────────────────────────────────────────────────────────
+const FAQTab = ({ item }) => {
+  const faqs = FAQS[item.id];
+  const [openIdx, setOpenIdx] = useState(null);
+
+  if (!faqs || faqs.length === 0) return (
+    <div className={styles.lessonWrap}>
+      <div className={styles.panel}>
+        <div className={styles.sectionTitle}>💬 Common Questions</div>
+        <p style={{ fontSize: 13, color: '#6b7280', margin: 0 }}>
+          No FAQs yet for this concept — check back soon.
+        </p>
+        <div style={{ marginTop: 12, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          <a href="https://developer.mozilla.org" target="_blank" rel="noopener noreferrer"
+            style={{ fontSize: 12, color: '#4facfe', padding: '6px 12px', border: '1px solid #1e3a5f', borderRadius: 6, textDecoration: 'none' }}>
+            📖 MDN Web Docs ↗
+          </a>
+          <a href="https://javascript.info" target="_blank" rel="noopener noreferrer"
+            style={{ fontSize: 12, color: '#9ca3af', padding: '6px 12px', border: '1px solid #1e2d40', borderRadius: 6, textDecoration: 'none' }}>
+            📚 javascript.info ↗
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className={styles.lessonWrap}>
+      <div className={styles.panel}>
+        <div className={styles.sectionTitle}>💬 Common Questions — {item.title}</div>
+        <p style={{ fontSize: 12, color: '#6b7280', margin: '0 0 14px' }}>
+          {faqs.length} questions developers commonly ask about this concept.
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {faqs.map((faq, i) => (
+            <div key={i} style={{ border: `1px solid ${openIdx === i ? '#4facfe40' : '#1e2d40'}`, borderRadius: 8, overflow: 'hidden', transition: 'border-color 0.2s' }}>
+              <button
+                onClick={() => setOpenIdx(openIdx === i ? null : i)}
+                style={{ width: '100%', background: openIdx === i ? '#05152a' : '#0d1829', border: 'none', padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', gap: 12 }}>
+                <span style={{ fontSize: 13, color: openIdx === i ? '#4facfe' : '#e2e8f0', textAlign: 'left', fontFamily: 'inherit', fontWeight: openIdx === i ? 600 : 400 }}>
+                  {faq.q}
+                </span>
+                <span style={{ color: openIdx === i ? '#4facfe' : '#6b7280', fontSize: 16, flexShrink: 0, transition: 'transform 0.2s', transform: openIdx === i ? 'rotate(45deg)' : 'rotate(0deg)' }}>
+                  +
+                </span>
+              </button>
+              {openIdx === i && (
+                <div style={{ padding: '12px 16px', background: '#060d1a', borderTop: '1px solid #1e2d40' }}>
+                  <p style={{ fontSize: 13, color: '#9ca3af', lineHeight: 1.7, margin: 0 }}>{faq.a}</p>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
       </div>
 
+      <div className={styles.panel} style={{ borderColor: '#1e2d40' }}>
+        <div className={styles.sectionTitle} style={{ fontSize: 12 }}>📚 Official Resources</div>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          {[
+            { label: 'MDN Web Docs', url: 'https://developer.mozilla.org' },
+            { label: 'javascript.info', url: 'https://javascript.info' },
+            { label: 'React Docs', url: 'https://react.dev' },
+            { label: 'TypeScript Docs', url: 'https://www.typescriptlang.org/docs' },
+            { label: 'web.dev', url: 'https://web.dev' },
+          ].map((link, i) => (
+            <a key={i} href={link.url} target="_blank" rel="noopener noreferrer"
+              style={{ fontSize: 11, color: '#9ca3af', padding: '5px 10px', border: '1px solid #1e2d40', borderRadius: 6, textDecoration: 'none' }}>
+              {link.label} ↗
+            </a>
+          ))}
+        </div>
+      </div>
     </div>
   );
 };
@@ -486,73 +530,6 @@ const ChallengeTab = ({ item }) => {
   );
 };
 
-// ── Chat Tab ───────────────────────────────────────────────────────────
-const ChatTab = ({ item }) => {
-  const [messages, setMessages] = useState([
-    { role: 'ai', text: `Ask me anything about **${item.title}**. I can explain concepts, show examples, compare approaches, or quiz you.` }
-  ]);
-  const [input, setInput] = useState('');
-  const [loading, setLoading] = useState(false);
-  const endRef = useRef(null);
-
-  useEffect(() => { endRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages]);
-
-  const send = async (msg) => {
-    const text = msg || input.trim();
-    if (!text || loading) return;
-    setInput('');
-    setMessages(prev => [...prev, { role: 'user', text }]);
-    setLoading(true);
-    try {
-      const { data } = await api.post('/ai/chat', {
-        messages: [{ role: 'user', content: `You are a senior frontend engineer tutor. Topic context: ${item.title}. Be concise (under 150 words unless code needed). Question: ${text}` }],
-        max_tokens: 600,
-      });
-      setMessages(prev => [...prev, { role: 'ai', text: data.content[0].text }]);
-    } catch (e) {
-      setMessages(prev => [...prev, { role: 'ai', text: 'Error: ' + e.message }]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const quickPrompts = [
-    `Give me a real-world ${item.title} example`,
-    `Most common interview mistake about ${item.title}?`,
-    `Quiz me on ${item.title}`,
-    `Compare to a related concept`,
-  ];
-
-  return (
-    <div className={styles.lessonWrap}>
-      <div className={styles.panel} style={{ display: 'flex', flexDirection: 'column', minHeight: 400 }}>
-        <div className={styles.sectionTitle}>AI Tutor — {item.title}</div>
-        <div className={styles.chatMsgs}>
-          {messages.map((m, i) => (
-            <div key={i} className={`${styles.chatMsg} ${m.role === 'user' ? styles.chatUser : styles.chatAI}`}>
-              {m.text}
-            </div>
-          ))}
-          {loading && <div className={styles.chatMsg + ' ' + styles.chatAI}>
-            <span className={styles.typing}>●●●</span>
-          </div>}
-          <div ref={endRef} />
-        </div>
-        <div className={styles.quickPrompts}>
-          {quickPrompts.map((p, i) => (
-            <button key={i} className={styles.quickPromptBtn} onClick={() => send(p)}>{p}</button>
-          ))}
-        </div>
-        <div className={styles.chatInputRow}>
-          <input className={styles.chatInput} value={input} onChange={e => setInput(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && !e.shiftKey && send()}
-            placeholder="Ask anything..." disabled={loading} />
-          <button className={styles.btnPrimary} onClick={() => send()} disabled={loading || !input.trim()}>Send</button>
-        </div>
-      </div>
-    </div>
-  );
-};
 
 const Skeleton = () => (
   <div className={styles.skeleton}>

@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import api from '../utils/api';
 import { useAuth } from './AuthContext';
+import { CONCEPTS } from 'reactdevmastery-content/data';
 
 const ProgressContext = createContext(null);
 
@@ -8,7 +9,8 @@ export const ProgressProvider = ({ children }) => {
   const { user, updateUser } = useAuth();
 
   const completedConcepts = user?.completedConcepts?.map((c) => c.conceptId) || [];
-  const completedTopics = user?.completedTopics || [];
+  const completedTopics = [...new Set(user?.completedTopics || [])];
+  const totalTopics = Object.keys(CONCEPTS).length;
   const flashCardsSeen = user?.flashCardsSeen || [];
   const quizCorrect = user?.quizCorrect || 0;
   const quizTotal = user?.quizTotal || 0;
@@ -68,7 +70,7 @@ export const ProgressProvider = ({ children }) => {
 
   return (
     <ProgressContext.Provider value={{
-      completedConcepts, completedTopics, flashCardsSeen,
+      completedConcepts, completedTopics, totalTopics, flashCardsSeen,
       quizCorrect, quizTotal, quizAccuracy,
       streak, activityLog,
       markConceptDone, recordQuiz, markFlashSeen, resetProgress,

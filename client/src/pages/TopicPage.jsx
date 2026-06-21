@@ -463,7 +463,7 @@ const ChallengeTab = ({ item }) => {
       {/* Self-assessment */}
       <div className={styles.panel} style={{ borderColor: '#2a3f5f' }}>
         <div className={styles.sectionTitle}>How did you do?</div>
-        <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
+        <div style={{ display: 'flex', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
           {[
             { v: 'stuck',   label: '😰 Got stuck',       color: '#ef4444' },
             { v: 'partial', label: '🤔 Partial solution', color: '#eab308' },

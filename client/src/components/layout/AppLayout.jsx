@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useProgress } from '../../context/ProgressContext';
@@ -13,10 +13,16 @@ const AppLayout = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   const currentPath = location.pathname.split('/').filter(Boolean)[0] || 'home';  
   const pct = Math.round((completedTopics.length / LEARNABLE_IDS.length) * 100);
   const initials = user?.name?.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2) || '?';
+
+  // Close the mobile drawer automatically whenever the route changes
+  useEffect(() => {
+    setMobileNavOpen(false);
+  }, [location.pathname]);
 
   const handleLogout = async () => {
     await logout();
@@ -26,8 +32,28 @@ const AppLayout = ({ children }) => {
 
   return (
     <div className={styles.app}>
+      {/* ── Mobile top bar (hidden on desktop via CSS) ─────────────── */}
+      <header className={styles.mobileTopbar}>
+        <button
+          className={styles.hamburgerBtn}
+          onClick={() => setMobileNavOpen(true)}
+          aria-label="Open menu"
+        >
+          ☰
+        </button>
+        <div className={styles.mobileLogo}>
+          <img src={logoIcon} alt="" className={styles.mobileLogoIcon} />
+          <span>REACTDEVMASTERY</span>
+        </div>
+      </header>
+
+      {/* ── Mobile drawer backdrop ──────────────────────────────────── */}
+      {mobileNavOpen && (
+        <div className={styles.backdrop} onClick={() => setMobileNavOpen(false)} />
+      )}
+
       {/* ── Sidebar ─────────────────────────────────────────────── */}
-      <aside className={styles.sidebar}>
+      <aside className={`${styles.sidebar} ${mobileNavOpen ? styles.sidebarOpen : ''}`}>
         <div className={styles.sidebarHeader}>
           <div className={styles.logo}>
             <div className={styles.logoIcon}><img src={logoIcon} alt="" style={{ width: '60%', height: '60%' }} /></div>
@@ -35,6 +61,13 @@ const AppLayout = ({ children }) => {
               <div className={styles.logoText}>REACTDEVMASTERY</div>
               <div className={styles.logoSub}>SENIOR FRONTEND</div>
             </div>
+            <button
+              className={styles.closeBtn}
+              onClick={() => setMobileNavOpen(false)}
+              aria-label="Close menu"
+            >
+              ✕
+            </button>
           </div>
 
           {/* User pill */}

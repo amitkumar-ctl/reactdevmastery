@@ -102,3 +102,13 @@
 .btnPrimary:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .empty { padding: 40px 24px; color: #9ca3af; font-size: 14px; }
+
+@media (max-width: 768px) {
+  .topbar { padding: 12px 16px; }
+  .content { padding: 14px 16px; }
+  .tabBar { padding: 0 16px; overflow-x: auto; }
+  .tabBtn { padding: 10px 12px; white-space: nowrap; }
+  .lessonWrap { max-width: 100%; }
+  .topicTitle { font-size: 17px; }
+  .chatMsg { max-width: 100%; }
+}

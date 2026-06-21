@@ -28,3 +28,8 @@
 .dangerText { font-size: 13px; color: #9ca3af; margin-bottom: 12px; line-height: 1.5; }
 .btnDanger { padding: 8px 16px; border-radius: 8px; border: 1px solid #ef4444; background: transparent; color: #ef4444; font-family: inherit; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.15s; }
 .btnDanger:hover { background: #2a0a0a; }
+
+@media (max-width: 768px) {
+  .twoCol { grid-template-columns: 1fr; }
+  .statsRow { flex-wrap: wrap; }
+}

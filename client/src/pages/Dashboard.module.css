@@ -247,3 +247,31 @@
   opacity: 0.8;
   transform: translateY(-1px);
 }
+
+@media (max-width: 768px) {
+  .topbar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .topActions {
+    width: 100%;
+  }
+
+  .btn, .btnPrimary {
+    flex: 1;
+  }
+
+  .content {
+    padding: 16px;
+  }
+
+  .statsGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .twoCol {
+    grid-template-columns: 1fr;
+  }
+}

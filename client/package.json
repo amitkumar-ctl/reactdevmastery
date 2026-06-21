@@ -10,7 +10,7 @@
     "react-hot-toast": "^2.4.1",
     "react-router-dom": "^6.21.0",
     "react-scripts": "5.0.1",
-    "reactdevmastery-content": "^1.0.7"
+    "reactdevmastery-content": "^1.0.9"
   },
   "scripts": {
     "start": "react-scripts start",

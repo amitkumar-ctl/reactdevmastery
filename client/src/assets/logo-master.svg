@@ -1,0 +1,29 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6366f1"/>
+      <stop offset="100%" stop-color="#4338ca"/>
+    </linearGradient>
+    <linearGradient id="markGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#e0e7ff"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background badge -->
+  <rect width="512" height="512" rx="112" fill="url(#bgGrad)"/>
+
+  <!-- Subtle inner highlight -->
+  <rect x="16" y="16" width="480" height="480" rx="98" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="2"/>
+
+  <!-- Code bracket mark: < / > -->
+  <g fill="none" stroke="url(#markGrad)" stroke-width="34" stroke-linecap="round" stroke-linejoin="round">
+    <!-- left chevron -->
+    <path d="M 192 156 L 110 256 L 192 356"/>
+    <!-- right chevron -->
+    <path d="M 320 156 L 402 256 L 320 356"/>
+  </g>
+
+  <!-- center slash (mastery mark) -->
+  <line x1="284" y1="140" x2="228" y2="372" stroke="#ffffff" stroke-width="22" stroke-linecap="round"/>
+</svg>

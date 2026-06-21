@@ -4,6 +4,7 @@ import { GoogleLogin } from '@react-oauth/google';
 import toast from 'react-hot-toast';
 import { useAuth } from '../../context/AuthContext';
 import styles from './Auth.module.css';
+import logoIcon from '../../assets/icon-transparent-white.svg';
 
 export const LoginPage = () => {
   const { login, googleLogin } = useAuth();
@@ -41,7 +42,7 @@ export const LoginPage = () => {
     <div className={styles.authPage}>
       <div className={styles.authCard}>
         <div className={styles.authLogo}>
-          <div className={styles.logoIcon}>⚡</div>
+          <div className={styles.logoIcon}><img src={logoIcon} alt="" style={{ width: '60%', height: '60%' }} /></div>
           <div>
             <div className={styles.logoText}>REACTDEVMASTERY</div>
             <div className={styles.logoSub}>SENIOR FRONTEND ACADEMY</div>
@@ -166,7 +167,7 @@ export const RegisterPage = () => {
     <div className={styles.authPage}>
       <div className={styles.authCard}>
         <div className={styles.authLogo}>
-          <div className={styles.logoIcon}>⚡</div>
+          <div className={styles.logoIcon}><img src={logoIcon} alt="" style={{ width: '60%', height: '60%' }} /></div>
           <div>
             <div className={styles.logoText}>REACTDEVMASTERY</div>
             <div className={styles.logoSub}>SENIOR FRONTEND ACADEMY</div>

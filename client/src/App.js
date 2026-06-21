@@ -14,6 +14,7 @@ import Profile from './pages/Profile';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ResetPasswordPage  from './pages/ResetPasswordPage';
 import QuizPage from './pages/QuizPage';
+import logoMaster from './assets/logo-master.svg';
 
 // ── Protected Route ────────────────────────────────────────────────────
 const PrivateRoute = ({ children }) => {
@@ -40,7 +41,7 @@ const LoadingScreen = () => (
     background: '#0a0e1a', fontFamily: 'Fira Code, monospace',
     flexDirection: 'column', gap: 16,
   }}>
-    <div style={{ fontSize: 32 }}>⚡</div>
+    <img src={logoMaster} alt="ReactDevMastery" style={{ width: 56, height: 56 }} />
     <div style={{ color: '#9ca3af', fontSize: 13, letterSpacing: 2 }}>LOADING...</div>
   </div>
 );

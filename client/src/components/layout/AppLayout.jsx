@@ -5,6 +5,7 @@ import { useProgress } from '../../context/ProgressContext';
 import { TOPICS, LEARNABLE_IDS } from 'reactdevmastery-content/data';
 import toast from 'react-hot-toast';
 import styles from './Layout.module.css';
+import logoIcon from '../../assets/icon-transparent-white.svg';
 
 const AppLayout = ({ children }) => {
   const { user, logout } = useAuth();
@@ -29,7 +30,7 @@ const AppLayout = ({ children }) => {
       <aside className={styles.sidebar}>
         <div className={styles.sidebarHeader}>
           <div className={styles.logo}>
-            <div className={styles.logoIcon}>⚡</div>
+            <div className={styles.logoIcon}><img src={logoIcon} alt="" style={{ width: '60%', height: '60%' }} /></div>
             <div>
               <div className={styles.logoText}>REACTDEVMASTERY</div>
               <div className={styles.logoSub}>SENIOR FRONTEND</div>

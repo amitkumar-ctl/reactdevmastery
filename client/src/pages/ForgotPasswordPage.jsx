@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import api from '../utils/api';
 import styles from '../components/auth/Auth.module.css';
+import logoIcon from '../assets/icon-transparent-white.svg';
 
 const ForgotPasswordPage = () => {
   const [email, setEmail]       = useState('');
@@ -28,7 +29,7 @@ const ForgotPasswordPage = () => {
     <div className={styles.authPage}>
       <div className={styles.authCard}>
         <div className={styles.authLogo}>
-          <div className={styles.logoIcon}>⚡</div>
+          <div className={styles.logoIcon}><img src={logoIcon} alt="" style={{ width: '60%', height: '60%' }} /></div>
           <div>
             <div className={styles.logoText}>REACTDEVMASTERY</div>
             <div className={styles.logoSub}>SENIOR FRONTEND ACADEMY</div>

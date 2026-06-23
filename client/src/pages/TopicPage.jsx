@@ -25,7 +25,6 @@ export const TopicPage = () => {
           <div className={styles.topicTitle}>{topic.title}</div>
           <div className={styles.topicMeta}>
             <span className={styles.tag} style={{ color: '#4facfe', borderColor: '#0a2d5f', background: '#05152a' }}>{topic.items.length} concepts</span>
-            <span className={styles.tag} style={{ color: '#00ff88', borderColor: '#0a4420', background: '#052210' }}>AI Explanations</span>
             {completedTopics.includes(topicId) && <span className={styles.tag} style={{ color: '#00ff88', borderColor: '#0a4420', background: '#052210' }}>✓ Complete</span>}
           </div>
         </div>

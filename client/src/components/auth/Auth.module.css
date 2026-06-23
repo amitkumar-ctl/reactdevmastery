@@ -224,6 +224,23 @@
   color: #00ff88;
 }
 
+.legalNote {
+  margin-top: 14px;
+  text-align: center;
+  font-size: 11px;
+  color: #6b7280;
+  line-height: 1.6;
+}
+
+.legalNote a {
+  color: #9ca3af;
+  text-decoration: underline;
+}
+
+.legalNote a:hover {
+  color: #4facfe;
+}
+
 /* Right-side visual */
 .authVisual {
   flex: 1;

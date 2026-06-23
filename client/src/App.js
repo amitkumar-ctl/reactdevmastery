@@ -14,6 +14,8 @@ import Profile from './pages/Profile';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ResetPasswordPage  from './pages/ResetPasswordPage';
 import QuizPage from './pages/QuizPage';
+import PrivacyPolicy from './pages/legal/PrivacyPolicy';
+import TermsOfService from './pages/legal/TermsOfService';
 import logoMaster from './assets/logo-master.svg';
 
 // ── Protected Route ────────────────────────────────────────────────────
@@ -71,6 +73,10 @@ const App = () => (
           <Route path="/reset-password/:token" element={<PublicRoute><ResetPasswordPage /></PublicRoute>} />
           <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
           <Route path="/register" element={<PublicRoute><RegisterPage /></PublicRoute>} />
+
+          {/* Always public — accessible whether signed in or not, for OAuth consent screen links */}
+          <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/terms" element={<TermsOfService />} />
 
           {/* Protected */}
           <Route path="/" element={<PrivateRoute><Dashboard /></PrivateRoute>} />

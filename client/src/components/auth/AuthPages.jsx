@@ -261,6 +261,12 @@ export const RegisterPage = () => {
           </button>
         </form>
 
+        <p className={styles.legalNote}>
+          By creating an account, you agree to our{' '}
+          <Link to="/terms">Terms of Service</Link> and{' '}
+          <Link to="/privacy">Privacy Policy</Link>.
+        </p>
+
         <p className={styles.switchLink}>
           Already have an account? <Link to="/login">Sign in →</Link>
         </p>

@@ -1,6 +1,6 @@
 .app {
   display: flex;
-  height: 100vh;
+  height: 100%;
   overflow: hidden;
   background: #0a0e1a;
   font-family: 'Fira Code', 'Courier New', monospace;
@@ -345,8 +345,7 @@
 
   .app {
     flex-direction: column;
-    height: 100vh;
-    height: 100dvh; /* dynamic viewport height — accounts for mobile browser chrome */
+    height: 100%;
   }
 
   .sidebar {

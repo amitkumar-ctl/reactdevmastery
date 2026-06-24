@@ -1,4 +1,4 @@
-.page { display: flex; flex-direction: column; height: 100%; overflow: hidden; }
+.page { display: flex; flex-direction: column; height: 100%; min-height: 0; overflow: hidden; }
 .topbar { padding: 14px 24px; border-bottom: 1px solid #1e2d40; background: #060910; flex-shrink: 0; display: flex; flex-direction: column; gap: 8px; }
 .backBtn { background: none; border: none; color: #9ca3af; font-family: inherit; font-size: 12px; cursor: pointer; text-align: left; transition: color 0.15s; }
 .backBtn:hover { color: #00ff88; }

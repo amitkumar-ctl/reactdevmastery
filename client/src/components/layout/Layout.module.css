@@ -346,6 +346,7 @@
   .app {
     flex-direction: column;
     height: 100vh;
+    height: 100dvh; /* dynamic viewport height — accounts for mobile browser chrome */
   }
 
   .sidebar {
@@ -367,5 +368,8 @@
   .main {
     flex: 1;
     min-height: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
   }
 }

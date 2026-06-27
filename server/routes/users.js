@@ -62,6 +62,38 @@ router.patch('/password', async (req, res, next) => {
   }
 });
 
+// ── POST /api/users/onboarding ───────────────────────────────────────
+router.post('/onboarding', async (req, res, next) => {
+  try {
+    const { currentLevel, goal, dailyGoal } = req.body;
+
+    const validLevels = ['junior', 'mid-early', 'mid-senior', 'senior'];
+    const validGoals  = ['active-interview', 'future-interview', 'upskilling', 'gaps'];
+
+    if (!validLevels.includes(currentLevel)) {
+      return res.status(400).json({ message: 'Invalid level' });
+    }
+    if (!validGoals.includes(goal)) {
+      return res.status(400).json({ message: 'Invalid goal' });
+    }
+
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      {
+        currentLevel,
+        goal,
+        dailyGoal: [1, 3, 5, 10].includes(Number(dailyGoal)) ? Number(dailyGoal) : 3,
+        onboardingCompleted: true,
+      },
+      { new: true, runValidators: true }
+    );
+
+    res.json({ success: true, user: user.toPublicJSON() });
+  } catch (err) {
+    next(err);
+  }
+});
+
 // ── GET /api/users/leaderboard ────────────────────────────────────────
 router.get('/leaderboard', async (req, res, next) => {
   try {

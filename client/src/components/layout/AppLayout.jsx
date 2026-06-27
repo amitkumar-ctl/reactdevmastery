@@ -6,6 +6,7 @@ import { TOPICS, LEARNABLE_IDS } from 'reactdevmastery-content/data';
 import toast from 'react-hot-toast';
 import styles from './Layout.module.css';
 import logoIcon from '../../assets/icon-transparent-white.svg';
+import OnboardingFlow from '../onboarding/OnboardingFlow';
 
 const AppLayout = ({ children }) => {
   const { user, logout } = useAuth();
@@ -32,6 +33,9 @@ const AppLayout = ({ children }) => {
 
   return (
     <div className={styles.app}>
+      {/* ── Onboarding overlay (new users only) ────────────────────── */}
+      {user && !user.onboardingCompleted && <OnboardingFlow />}
+
       {/* ── Mobile top bar (hidden on desktop via CSS) ─────────────── */}
       <header className={styles.mobileTopbar}>
         <button

@@ -67,6 +67,20 @@ const userSchema = new mongoose.Schema(
     // ── Account ──────────────────────────────────────────
     isVerified: { type: Boolean, default: false },
     role: { type: String, enum: ['user', 'admin'], default: 'user' },
+
+    // ── Onboarding ───────────────────────────────────────
+    onboardingCompleted: { type: Boolean, default: false },
+    currentLevel: {
+      type: String,
+      enum: ['junior', 'mid-early', 'mid-senior', 'senior'],
+      default: null,
+    },
+    goal: {
+      type: String,
+      enum: ['active-interview', 'future-interview', 'upskilling', 'gaps'],
+      default: null,
+    },
+    dailyGoal: { type: Number, default: 3 },
   },
   {
     timestamps: true,
@@ -140,6 +154,10 @@ userSchema.methods.toPublicJSON = function () {
     quizTotal: this.quizTotal,
     quizAccuracy: this.quizAccuracy,
     role: this.role,
+    onboardingCompleted: this.onboardingCompleted,
+    currentLevel: this.currentLevel,
+    goal: this.goal,
+    dailyGoal: this.dailyGoal,
     createdAt: this.createdAt,
   };
 };

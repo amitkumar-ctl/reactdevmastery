@@ -10,6 +10,17 @@ const Dashboard = () => {
   const { completedTopics, completedConcepts, quizCorrect, quizTotal, quizAccuracy, streak, activityLog } = useProgress();
   const navigate = useNavigate();
 
+  // Daily goal progress — concepts completed today
+  const today = new Date().toISOString().slice(0, 10);
+  const todayActivity = activityLog?.[today] || 0;
+  const dailyGoal = user?.dailyGoal || 3;
+  const dailyPct = Math.min(Math.round((todayActivity / dailyGoal) * 100), 100);
+  const dailyDone = dailyPct >= 100;
+
+  // Personalise welcome message
+  const isNewUser = user?.completedTopics?.length === 0 && user?.quizTotal === 0;
+  const firstName = user?.name?.split(' ')[0];
+
   const totalConcepts = Object.values(CONCEPTS).flatMap(t => t.items).length;
 
   // Activity grid — last 36 days
@@ -75,9 +86,42 @@ const Dashboard = () => {
     <div className={styles.page}>
       <div className={styles.topbar}>
         <div>
-          <div className={styles.welcome}>Welcome back, {user?.name?.split(' ')[0]} 👋</div>
-          <div className={styles.welcomeSub}>Continue your path to senior engineer</div>
+          <div className={styles.welcome}>
+            {isNewUser ? `Welcome, ${firstName} 👋` : `Welcome back, ${firstName} 👋`}
+          </div>
+          <div className={styles.welcomeSub}>
+            {isNewUser
+              ? 'Your journey to senior engineer starts here'
+              : 'Continue your path to senior engineer'}
+          </div>
         </div>
+
+        {/* Daily goal ring */}
+        <div className={styles.dailyGoal} title={`${todayActivity} of ${dailyGoal} concepts today`}>
+          <svg width="44" height="44" viewBox="0 0 44 44">
+            <circle cx="22" cy="22" r="18" fill="none" stroke="#1e2d40" strokeWidth="4" />
+            <circle
+              cx="22" cy="22" r="18"
+              fill="none"
+              stroke={dailyDone ? '#00ff88' : '#4facfe'}
+              strokeWidth="4"
+              strokeDasharray={`${2 * Math.PI * 18}`}
+              strokeDashoffset={`${2 * Math.PI * 18 * (1 - dailyPct / 100)}`}
+              strokeLinecap="round"
+              transform="rotate(-90 22 22)"
+              style={{ transition: 'stroke-dashoffset 0.6s ease' }}
+            />
+            <text x="22" y="26" textAnchor="middle" fontSize="10" fontWeight="700"
+              fill={dailyDone ? '#00ff88' : '#e2e8f0'}
+              fontFamily="Fira Code, monospace">
+              {dailyDone ? '✓' : `${todayActivity}/${dailyGoal}`}
+            </text>
+          </svg>
+          <div className={styles.dailyGoalLabel}>
+            {dailyDone ? 'Goal done!' : 'Today'}
+          </div>
+        </div>
+
         <div className={styles.topActions}>
           <button className={styles.btn} onClick={() => navigate('/flashcards')}>⚡ Flash Cards</button>
           <button className={styles.btnPrimary} onClick={() => navigate('/quiz')}>🎯 Quiz Me</button>

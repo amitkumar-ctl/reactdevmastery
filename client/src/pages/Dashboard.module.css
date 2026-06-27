@@ -33,6 +33,21 @@
   gap: 8px;
 }
 
+.dailyGoal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  flex-shrink: 0;
+}
+
+.dailyGoalLabel {
+  font-size: 9px;
+  color: #9ca3af;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
 .btn {
   padding: 7px 14px;
   border-radius: 6px;

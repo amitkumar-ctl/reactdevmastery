@@ -38,18 +38,18 @@ const FEATURES = [
 ];
 
 const TOPIC_PREVIEWS = [
-  { id: 'js-core',     icon: '⚡', label: 'JS Internals' },
-  { id: 'closures',    icon: '🔒', label: 'Closures' },
-  { id: 'async',       icon: '⏳', label: 'Async & Promises' },
-  { id: 'react-core',  icon: '⚛',  label: 'React Internals' },
-  { id: 'hooks',       icon: '🪝', label: 'Hooks & State' },
-  { id: 'perf',        icon: '📊', label: 'Performance' },
-  { id: 'security',    icon: '🔐', label: 'Security' },
-  { id: 'ts',          icon: '📘', label: 'TypeScript' },
-  { id: 'system-design', icon: '🏗', label: 'System Design' },
-  { id: 'patterns',    icon: '🧩', label: 'Design Patterns' },
-  { id: 'a11y',        icon: '♿', label: 'Accessibility' },
-  { id: 'nextjs',      icon: '▲',  label: 'Next.js' },
+  { id: 'js-core',       icon: '⚡', label: 'JavaScript Internals',       count: 6,  tag: 'Foundation' },
+  { id: 'closures',      icon: '🔒', label: 'Closures & Scope',           count: 3,  tag: 'Core' },
+  { id: 'async',         icon: '⏳', label: 'Async & Promises',           count: 4,  tag: 'Core' },
+  { id: 'react-core',    icon: '⚛',  label: 'React Internals',            count: 4,  tag: 'React' },
+  { id: 'hooks',         icon: '🪝', label: 'Hooks & State',              count: 3,  tag: 'React' },
+  { id: 'ts',            icon: '📘', label: 'TypeScript Deep Dive',       count: 6,  tag: 'Language' },
+  { id: 'perf',          icon: '📊', label: 'Performance & CWV',          count: 5,  tag: 'Advanced' },
+  { id: 'security',      icon: '🔐', label: 'Security',                   count: 3,  tag: 'Advanced' },
+  { id: 'system-design', icon: '🏗',  label: 'System Design',             count: 3,  tag: 'Architecture' },
+  { id: 'patterns',      icon: '🧩', label: 'Design Patterns',            count: 10, tag: 'Architecture' },
+  { id: 'a11y',          icon: '♿', label: 'Accessibility',              count: 7,  tag: 'Frontend' },
+  { id: 'nextjs',        icon: '▲',  label: 'Next.js',                    count: 6,  tag: 'Framework' },
 ];
 
 const LandingPage = () => {
@@ -124,13 +124,26 @@ const LandingPage = () => {
       <section className={styles.topics}>
         <div className={styles.sectionTitle}>Topics</div>
         <h2 className={styles.sectionHeading}>Browse the curriculum</h2>
+        <p className={styles.sectionSub}>Click any topic to start reading — no account needed.</p>
         <div className={styles.topicGrid}>
           {TOPIC_PREVIEWS.map(t => (
-            <Link key={t.id} to={`/${t.id}`} className={styles.topicChip}>
-              <span className={styles.topicIcon}>{t.icon}</span>
-              {t.label}
+            <Link key={t.id} to={`/${t.id}`} className={styles.topicCard}>
+              <div className={styles.topicCardTop}>
+                <span className={styles.topicCardIcon}>{t.icon}</span>
+                <span className={styles.topicCardTag}>{t.tag}</span>
+              </div>
+              <div className={styles.topicCardLabel}>{t.label}</div>
+              <div className={styles.topicCardFooter}>
+                <span className={styles.topicCardCount}>{t.count} concepts</span>
+                <span className={styles.topicCardArrow}>→</span>
+              </div>
             </Link>
           ))}
+        </div>
+        <div className={styles.topicSeeAll}>
+          <Link to="/js-core" className={styles.topicSeeAllLink}>
+            View all 30+ topics →
+          </Link>
         </div>
       </section>
 

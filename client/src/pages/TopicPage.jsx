@@ -1,9 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import { useProgress } from '../context/ProgressContext';
 import { CONCEPTS, QUIZZES, CONTENT, CHALLENGES, FAQS } from 'reactdevmastery-content/data';
 import { LEARN_COMPONENTS, VISUALIZERS } from 'reactdevmastery-content/components';
 import styles from './TopicPage.module.css';
+import SignupPrompt from '../components/guest/SignupPrompt';
 
 // ── Topic list ─────────────────────────────────────────────────────────
 export const TopicPage = () => {
@@ -25,6 +27,7 @@ export const TopicPage = () => {
           <div className={styles.topicTitle}>{topic.title}</div>
           <div className={styles.topicMeta}>
             <span className={styles.tag} style={{ color: '#4facfe', borderColor: '#0a2d5f', background: '#05152a' }}>{topic.items.length} concepts</span>
+            <span className={styles.tag} style={{ color: '#00ff88', borderColor: '#0a4420', background: '#052210' }}>AI Explanations</span>
             {completedTopics.includes(topicId) && <span className={styles.tag} style={{ color: '#00ff88', borderColor: '#0a4420', background: '#052210' }}>✓ Complete</span>}
           </div>
         </div>
@@ -62,6 +65,7 @@ export const TopicPage = () => {
 export const ConceptPage = () => {
   const { topicId, conceptId } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { completedConcepts, markConceptDone, recordQuiz } = useProgress();
   const [tab, setTab] = useState('learn');
   const topic = CONCEPTS[topicId];
@@ -69,6 +73,7 @@ export const ConceptPage = () => {
 
   if (!topic || !item) return <div className={styles.page}><div className={styles.empty}>Concept not found.</div></div>;
 
+  const isGuest = !user;
   const done = completedConcepts.includes(item.id);
   const allIds = topic.items.map(i => i.id);
 
@@ -86,7 +91,11 @@ export const ConceptPage = () => {
             </span>
             {done
               ? <span className={styles.tag} style={{ color: '#00ff88' }}>✓ Completed</span>
-              : <button className={styles.markDoneBtn} onClick={handleMarkDone}>Mark Complete ✓</button>
+              : (
+                <SignupPrompt isGuest={isGuest} feature="save your progress and track completed concepts">
+                  <button className={styles.markDoneBtn} onClick={handleMarkDone}>Mark Complete ✓</button>
+                </SignupPrompt>
+              )
             }
           </div>
         </div>
@@ -102,7 +111,15 @@ export const ConceptPage = () => {
 
       <div className={styles.content}>
         {tab === 'learn' && <LearnTab item={item} topicId={topicId} />}
-        {tab === 'quiz' && <QuizTab item={item} topicId={topicId} onAnswer={recordQuiz} onCorrect={() => markConceptDone(item.id, topicId, allIds)} />}
+        {tab === 'quiz' && (
+          <QuizTab
+            item={item}
+            topicId={topicId}
+            isGuest={isGuest}
+            onAnswer={recordQuiz}
+            onCorrect={() => markConceptDone(item.id, topicId, allIds)}
+          />
+        )}
         {tab === 'faq' && <FAQTab item={item} />}
       </div>
     </div>
@@ -268,7 +285,7 @@ const FAQTab = ({ item }) => {
 };
 
 // ── Quiz Tab ───────────────────────────────────────────────────────────
-const QuizTab = ({ item, topicId, onAnswer, onCorrect }) => {
+const QuizTab = ({ item, topicId, onAnswer, onCorrect, isGuest = false }) => {
   const [quizzes, setQuizzes] = useState(QUIZZES[item.id] || []);
   const [idx, setIdx] = useState(0);
   const [answered, setAnswered] = useState(false);
@@ -285,16 +302,18 @@ const QuizTab = ({ item, topicId, onAnswer, onCorrect }) => {
     setAnswered(true);
     setSelected(optIdx);
     const correct = optIdx === q.correct;
-    onAnswer?.(item.id, topicId, correct);
 
-    // Record answer for this question
+    // Only save to server for logged-in users
+    if (!isGuest) {
+      onAnswer?.(item.id, topicId, correct);
+    }
+
     const newAnswered = new Set(answeredIndices);
     newAnswered.add(idx);
     setAnsweredIndices(newAnswered);
     setSelectedAnswers(prev => ({ ...prev, [idx]: optIdx }));
 
-    // Mark concept complete when ALL questions have been answered
-    if (newAnswered.size === quizzes.length) {
+    if (!isGuest && newAnswered.size === quizzes.length) {
       onCorrect?.();
     }
   };
@@ -362,6 +381,14 @@ const QuizTab = ({ item, topicId, onAnswer, onCorrect }) => {
         {answered && (
           <div className={`${styles.quizFeedback} ${selected === q.correct ? styles.feedbackPass : styles.feedbackFail}`}>
             {selected === q.correct ? '✓ Correct!' : '✗ Not quite.'}<br /><br />{q.explain}
+          </div>
+        )}
+
+        {/* Guest nudge — shown after answering */}
+        {answered && isGuest && (
+          <div style={{ marginTop: 10, padding: '10px 14px', background: '#0d1829', border: '1px solid #1e2d40', borderRadius: 8, fontSize: 12, color: '#9ca3af', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
+            <span>🔒 Sign up to save your quiz scores and track accuracy</span>
+            <a href="/register" style={{ color: '#00ff88', fontWeight: 700, textDecoration: 'none', whiteSpace: 'nowrap' }}>Sign up free →</a>
           </div>
         )}
 

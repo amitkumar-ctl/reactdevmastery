@@ -1,0 +1,169 @@
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import styles from './LandingPage.module.css';
+import SignupPrompt from '../components/guest/SignupPrompt';
+import logoIcon from '../assets/icon-transparent-white.svg';
+
+const FEATURES = [
+  {
+    icon: '⚡',
+    title: 'Interactive Visualizers',
+    sub: 'Watch the Event Loop, Closure scope, and React Fiber work in real time — not just theory.',
+  },
+  {
+    icon: '🎯',
+    title: 'Interview Round Prep',
+    sub: 'JS, React, Machine Coding, System Design, Debugging, Security, Behavioral, and Rapid Fire rounds.',
+  },
+  {
+    icon: '📖',
+    title: '30+ Deep-dive Topics',
+    sub: 'JavaScript internals, TypeScript, React architecture, performance, accessibility, and more.',
+  },
+  {
+    icon: '🧠',
+    title: 'FAQs & Concept Cards',
+    sub: '900+ Q&A pairs written for senior interview answers, not textbook definitions.',
+  },
+  {
+    icon: '🔥',
+    title: 'Streak & Progress Tracking',
+    sub: 'Daily streaks, activity heatmap, per-topic progress bars, and quiz accuracy over time.',
+  },
+  {
+    icon: '🏆',
+    title: 'Leaderboard',
+    sub: 'See where you stand against other engineers preparing for the same senior roles.',
+  },
+];
+
+const TOPIC_PREVIEWS = [
+  { id: 'js-core',     icon: '⚡', label: 'JS Internals' },
+  { id: 'closures',    icon: '🔒', label: 'Closures' },
+  { id: 'async',       icon: '⏳', label: 'Async & Promises' },
+  { id: 'react-core',  icon: '⚛',  label: 'React Internals' },
+  { id: 'hooks',       icon: '🪝', label: 'Hooks & State' },
+  { id: 'perf',        icon: '📊', label: 'Performance' },
+  { id: 'security',    icon: '🔐', label: 'Security' },
+  { id: 'ts',          icon: '📘', label: 'TypeScript' },
+  { id: 'system-design', icon: '🏗', label: 'System Design' },
+  { id: 'patterns',    icon: '🧩', label: 'Design Patterns' },
+  { id: 'a11y',        icon: '♿', label: 'Accessibility' },
+  { id: 'nextjs',      icon: '▲',  label: 'Next.js' },
+];
+
+const LandingPage = () => {
+  const navigate = useNavigate();
+  const [promptOpen, setPromptOpen] = useState(false);
+
+  return (
+    <div className={styles.page}>
+
+      {/* ── Header ─────────────────────────────────────────────────── */}
+      <header className={styles.header}>
+        <div className={styles.headerLogo}>
+          <div className={styles.headerLogoIcon}>
+            <img src={logoIcon} alt="" style={{ width: '60%', height: '60%' }} />
+          </div>
+          <span className={styles.headerLogoText}>REACTDEVMASTERY</span>
+        </div>
+        <div className={styles.headerActions}>
+          <Link to="/login" className={styles.btnLogin}>Log in</Link>
+          <Link to="/register" className={styles.btnSignup}>Sign up free →</Link>
+        </div>
+      </header>
+
+      {/* ── Hero ───────────────────────────────────────────────────── */}
+      <section className={styles.hero}>
+        <div className={styles.heroBadge}>Senior Frontend Interview Prep</div>
+        <h1 className={styles.heroTitle}>
+          Go from mid-level to<br /><span>senior engineer</span>
+        </h1>
+        <p className={styles.heroSub}>
+          Interactive visualizers, real interview rounds, and 900+ concept-level Q&As
+          built specifically for engineers targeting senior frontend roles.
+          Free, forever.
+        </p>
+        <div className={styles.heroActions}>
+          <Link to="/register" className={styles.heroCta}>Start learning free →</Link>
+          <Link to="/js-core" className={styles.heroExplore}>Explore content</Link>
+        </div>
+      </section>
+
+      {/* ── Stats ──────────────────────────────────────────────────── */}
+      <div className={styles.statsBar}>
+        {[
+          { num: '30+',  label: 'Topics covered' },
+          { num: '900+', label: 'Concept Q&As' },
+          { num: '8',    label: 'Interview rounds' },
+          { num: '100%', label: 'Free forever' },
+        ].map((s, i) => (
+          <div key={i} className={styles.stat}>
+            <div className={styles.statNum}>{s.num}</div>
+            <div className={styles.statLabel}>{s.label}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* ── Features ───────────────────────────────────────────────── */}
+      <section className={styles.features}>
+        <div className={styles.sectionTitle}>What's inside</div>
+        <h2 className={styles.sectionHeading}>Everything you need for a senior interview</h2>
+        <div className={styles.featureGrid}>
+          {FEATURES.map((f, i) => (
+            <div key={i} className={styles.featureCard}>
+              <div className={styles.featureIcon}>{f.icon}</div>
+              <div className={styles.featureTitle}>{f.title}</div>
+              <div className={styles.featureSub}>{f.sub}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── Topics preview ─────────────────────────────────────────── */}
+      <section className={styles.topics}>
+        <div className={styles.sectionTitle}>Topics</div>
+        <h2 className={styles.sectionHeading}>Browse the curriculum</h2>
+        <div className={styles.topicGrid}>
+          {TOPIC_PREVIEWS.map(t => (
+            <Link key={t.id} to={`/${t.id}`} className={styles.topicChip}>
+              <span className={styles.topicIcon}>{t.icon}</span>
+              {t.label}
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* ── CTA ────────────────────────────────────────────────────── */}
+      <section className={styles.ctaSection}>
+        <h2 className={styles.ctaTitle}>Ready to level up?</h2>
+        <p className={styles.ctaSub}>
+          Create a free account to track your progress, earn streaks,
+          and get a personalised learning plan built around your timeline.
+        </p>
+        <div className={styles.heroActions}>
+          <Link to="/register" className={styles.heroCta}>Create free account →</Link>
+          <button className={styles.heroExplore} onClick={() => navigate('/js-core')}>
+            Browse without signing up
+          </button>
+        </div>
+      </section>
+
+      {/* ── Footer ─────────────────────────────────────────────────── */}
+      <footer className={styles.footer}>
+        <span>© 2026 ReactDevMastery</span>
+        <Link to="/privacy">Privacy Policy</Link>
+        <Link to="/terms">Terms of Service</Link>
+      </footer>
+
+      {/* Signup prompt modal (used by sidebar protected items) */}
+      {promptOpen && (
+        <SignupPrompt isGuest={true} feature="access this feature">
+          <button style={{ display: 'none' }} />
+        </SignupPrompt>
+      )}
+    </div>
+  );
+};
+
+export default LandingPage;

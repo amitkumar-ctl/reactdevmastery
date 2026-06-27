@@ -7,6 +7,10 @@ import toast from 'react-hot-toast';
 import styles from './Layout.module.css';
 import logoIcon from '../../assets/icon-transparent-white.svg';
 import OnboardingFlow from '../onboarding/OnboardingFlow';
+import SignupPrompt from '../guest/SignupPrompt';
+
+// Routes that require login — clicking these as a guest shows SignupPrompt
+const PROTECTED_IDS = new Set(['home', 'flashcards', 'quiz', 'profile']);
 
 const AppLayout = ({ children }) => {
   const { user, logout } = useAuth();
@@ -15,12 +19,13 @@ const AppLayout = ({ children }) => {
   const location = useLocation();
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [guestPrompt, setGuestPrompt] = useState(null); // feature label string or null
 
-  const currentPath = location.pathname.split('/').filter(Boolean)[0] || 'home';  
+  const isGuest = !user;
+  const currentPath = location.pathname.split('/').filter(Boolean)[0] || 'home';
   const pct = Math.round((completedTopics.length / LEARNABLE_IDS.length) * 100);
   const initials = user?.name?.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2) || '?';
 
-  // Close the mobile drawer automatically whenever the route changes
   useEffect(() => {
     setMobileNavOpen(false);
   }, [location.pathname]);
@@ -29,6 +34,21 @@ const AppLayout = ({ children }) => {
     await logout();
     toast.success('Logged out');
     navigate('/login');
+  };
+
+  const handleNavClick = (topicId, href) => {
+    if (isGuest && PROTECTED_IDS.has(topicId)) {
+      const labels = {
+        home: 'access your Dashboard',
+        flashcards: 'use Flash Cards',
+        quiz: 'take the Quiz',
+        profile: 'view your Profile',
+      };
+      setGuestPrompt(labels[topicId] || 'use this feature');
+      return;
+    }
+    navigate(href);
+    setMobileNavOpen(false);
   };
 
   return (
@@ -74,37 +94,49 @@ const AppLayout = ({ children }) => {
             </button>
           </div>
 
-          {/* User pill */}
-          <div className={styles.userPill} onClick={() => setUserMenuOpen(!userMenuOpen)}>
-            {user?.avatar
-              ? <img src={user.avatar} alt={user.name} className={styles.userAvatar} />
-              : <div className={styles.userAvatarFallback}>{initials}</div>
-            }
-            <div className={styles.userInfo}>
-              <div className={styles.userName}>{user?.name}</div>
-              <div className={styles.userEmail}>{user?.email}</div>
-            </div>
-            <span className={styles.chevron}>{userMenuOpen ? '▲' : '▼'}</span>
-          </div>
+          {/* User pill — shows login/signup for guests */}
+          {user ? (
+            <>
+              <div className={styles.userPill} onClick={() => setUserMenuOpen(!userMenuOpen)}>
+                {user?.avatar
+                  ? <img src={user.avatar} alt={user.name} className={styles.userAvatar} />
+                  : <div className={styles.userAvatarFallback}>{initials}</div>
+                }
+                <div className={styles.userInfo}>
+                  <div className={styles.userName}>{user?.name}</div>
+                  <div className={styles.userEmail}>{user?.email}</div>
+                </div>
+                <span className={styles.chevron}>{userMenuOpen ? '▲' : '▼'}</span>
+              </div>
 
-          {userMenuOpen && (
-            <div className={styles.userMenu}>
-              <div className={styles.userMenuItem} onClick={() => { navigate('/profile'); setUserMenuOpen(false); }}>⚙ Profile Settings</div>
-              <div className={styles.userMenuItem} onClick={() => { navigate('/leaderboard'); setUserMenuOpen(false); }}>🏆 Leaderboard</div>
-              <div className={`${styles.userMenuItem} ${styles.userMenuDanger}`} onClick={handleLogout}>↩ Sign Out</div>
+              {userMenuOpen && (
+                <div className={styles.userMenu}>
+                  <div className={styles.userMenuItem} onClick={() => { navigate('/profile'); setUserMenuOpen(false); }}>⚙ Profile Settings</div>
+                  <div className={styles.userMenuItem} onClick={() => { navigate('/leaderboard'); setUserMenuOpen(false); }}>🏆 Leaderboard</div>
+                  <div className={`${styles.userMenuItem} ${styles.userMenuDanger}`} onClick={handleLogout}>↩ Sign Out</div>
+                </div>
+              )}
+
+              {/* Progress */}
+              <div className={styles.progressWrap}>
+                <div className={styles.progressBar}>
+                  <div className={styles.progressFill} style={{ width: `${pct}%` }} />
+                </div>
+                <div className={styles.progressMeta}>
+                  <span>{pct}% · {completedTopics.length}/{LEARNABLE_IDS.length} topics</span>
+                  <span className={styles.streakBadge}>🔥 {streak}d</span>
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className={styles.guestPill}>
+              <div className={styles.guestLabel}>👀 Browsing as guest</div>
+              <div className={styles.guestActions}>
+                <button className={styles.guestSignup} onClick={() => navigate('/register')}>Sign up free</button>
+                <button className={styles.guestLogin} onClick={() => navigate('/login')}>Log in</button>
+              </div>
             </div>
           )}
-
-          {/* Progress */}
-          <div className={styles.progressWrap}>
-            <div className={styles.progressBar}>
-              <div className={styles.progressFill} style={{ width: `${pct}%` }} />
-            </div>
-            <div className={styles.progressMeta}>
-              <span>{pct}% · {completedTopics.length}/{LEARNABLE_IDS.length} topics</span>
-              <span className={styles.streakBadge}>🔥 {streak}d</span>
-            </div>
-          </div>
         </div>
 
         {/* Nav */}
@@ -118,15 +150,25 @@ const AppLayout = ({ children }) => {
               const active = currentPath === t.id || (t.id === 'home' && currentPath === '');
               const done = completedTopics.includes(t.id);
               const href = t.id === 'home' ? '/' : `/${t.id}`;
+              const locked = isGuest && PROTECTED_IDS.has(t.id);
               return (
                 <React.Fragment key={t.id}>
                   {sectionEl}
-                  <div className={`${styles.navItem} ${active ? styles.active : ''}`} onClick={() => navigate(href)}>
+                  <div
+                    className={`${styles.navItem} ${active ? styles.active : ''} ${locked ? styles.navLocked : ''}`}
+                    onClick={() => handleNavClick(t.id, href)}
+                    title={locked ? 'Sign up to access' : undefined}
+                  >
                     <span className={styles.navIcon}>{t.icon}</span>
                     <span className={styles.navLabel}>{t.label}</span>
-                    {done ? <span className={styles.navDone}>✓</span>
-                      : t.badge ? <span className={`${styles.navBadge} ${styles[t.badge?.toLowerCase?.() === 'new' ? 'badgeNew' : 'badgeHot']}`}>{t.badge}</span>
-                      : null}
+                    {locked
+                      ? <span className={styles.navLockIcon}>🔒</span>
+                      : done
+                        ? <span className={styles.navDone}>✓</span>
+                        : t.badge
+                          ? <span className={`${styles.navBadge} ${styles[t.badge?.toLowerCase?.() === 'new' ? 'badgeNew' : 'badgeHot']}`}>{t.badge}</span>
+                          : null
+                    }
                   </div>
                 </React.Fragment>
               );
@@ -139,6 +181,11 @@ const AppLayout = ({ children }) => {
       <main className={styles.main}>
         {children}
       </main>
+
+      {/* ── Guest signup prompt (triggered by protected nav clicks) ── */}
+      {guestPrompt && (
+        <SignupPrompt isGuest={true} feature={guestPrompt} _forceOpen onClose={() => setGuestPrompt(null)} />
+      )}
     </div>
   );
 };

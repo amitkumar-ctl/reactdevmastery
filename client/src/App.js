@@ -16,27 +16,11 @@ import ResetPasswordPage  from './pages/ResetPasswordPage';
 import QuizPage from './pages/QuizPage';
 import PrivacyPolicy from './pages/legal/PrivacyPolicy';
 import TermsOfService from './pages/legal/TermsOfService';
+import GuestBanner from './components/guest/GuestBanner';
+import LandingPage from './pages/LandingPage';
 import logoMaster from './assets/logo-master.svg';
 
-// ── Protected Route ────────────────────────────────────────────────────
-const PrivateRoute = ({ children }) => {
-  const { user, loading } = useAuth();
-  if (loading) return <LoadingScreen />;
-  if (!user) return <Navigate to="/login" replace />;
-  return (
-    <ProgressProvider>
-      <AppLayout>{children}</AppLayout>
-    </ProgressProvider>
-  );
-};
-
-const PublicRoute = ({ children }) => {
-  const { user, loading } = useAuth();
-  if (loading) return <LoadingScreen />;
-  if (user) return <Navigate to="/" replace />;
-  return children;
-};
-
+// ── Loading screen ─────────────────────────────────────────────────────
 const LoadingScreen = () => (
   <div style={{
     height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -48,6 +32,64 @@ const LoadingScreen = () => (
   </div>
 );
 
+// ── Route wrappers ─────────────────────────────────────────────────────
+
+// Root route: logged-in → Dashboard, guest → Landing page
+const RootRoute = () => {
+  const { user, loading } = useAuth();
+  if (loading) return <LoadingScreen />;
+  if (!user) return <LandingPage />;
+  return (
+    <ProgressProvider>
+      <AppLayout><Dashboard /></AppLayout>
+    </ProgressProvider>
+  );
+};
+
+// Requires login — redirects guests to /js-core (not /login, so they see the product first)
+const PrivateRoute = ({ children }) => {
+  const { user, loading } = useAuth();
+  if (loading) return <LoadingScreen />;
+  if (!user) return <Navigate to="/js-core" replace />;
+  return (
+    <ProgressProvider>
+      <AppLayout>{children}</AppLayout>
+    </ProgressProvider>
+  );
+};
+
+// Guest-accessible — renders for everyone
+// Logged-in users: full experience
+// Guests: same app shell + GuestBanner, stateful actions handled by SignupPrompt inline
+const GuestRoute = ({ children }) => {
+  const { user, loading } = useAuth();
+  if (loading) return <LoadingScreen />;
+  if (user) {
+    return (
+      <ProgressProvider>
+        <AppLayout>{children}</AppLayout>
+      </ProgressProvider>
+    );
+  }
+  return (
+    <ProgressProvider>
+      <AppLayout>
+        <GuestBanner />
+        {children}
+      </AppLayout>
+    </ProgressProvider>
+  );
+};
+
+// Redirect logged-in users away from auth pages
+const PublicRoute = ({ children }) => {
+  const { user, loading } = useAuth();
+  if (loading) return <LoadingScreen />;
+  if (user) return <Navigate to="/" replace />;
+  return children;
+};
+
+// ── App ────────────────────────────────────────────────────────────────
 const App = () => (
   <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID || 'placeholder'}>
     <AuthProvider>
@@ -56,36 +98,38 @@ const App = () => (
           position="bottom-right"
           toastOptions={{
             style: {
-              background: '#111827',
-              color: '#e2e8f0',
+              background: '#111827', color: '#e2e8f0',
               border: '1px solid #1e2d40',
-              fontFamily: 'Fira Code, monospace',
-              fontSize: '13px',
+              fontFamily: 'Fira Code, monospace', fontSize: '13px',
             },
             success: { iconTheme: { primary: '#00ff88', secondary: '#111827' } },
-            error: { iconTheme: { primary: '#ef4444', secondary: '#111827' } },
+            error:   { iconTheme: { primary: '#ef4444', secondary: '#111827' } },
           }}
         />
 
         <Routes>
-          {/* Public */}
+          {/* Auth pages — redirect logged-in users away */}
           <Route path="/forgot-password"       element={<PublicRoute><ForgotPasswordPage /></PublicRoute>} />
           <Route path="/reset-password/:token" element={<PublicRoute><ResetPasswordPage /></PublicRoute>} />
-          <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
-          <Route path="/register" element={<PublicRoute><RegisterPage /></PublicRoute>} />
+          <Route path="/login"                 element={<PublicRoute><LoginPage /></PublicRoute>} />
+          <Route path="/register"              element={<PublicRoute><RegisterPage /></PublicRoute>} />
 
-          {/* Always public — accessible whether signed in or not, for OAuth consent screen links */}
+          {/* Always public — legal */}
           <Route path="/privacy" element={<PrivacyPolicy />} />
-          <Route path="/terms" element={<TermsOfService />} />
+          <Route path="/terms"   element={<TermsOfService />} />
 
-          {/* Protected */}
-          <Route path="/" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+          {/* Root: logged-in → Dashboard, guest → /js-core */}
+          <Route path="/" element={<RootRoute />} />
+
+          {/* Protected — require login, guests redirected to /js-core */}
           <Route path="/flashcards" element={<PrivateRoute><FlashCards /></PrivateRoute>} />
-          <Route path="/leaderboard" element={<PrivateRoute><Leaderboard /></PrivateRoute>} />
-          <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
-          <Route path="/quiz" element={<PrivateRoute><QuizPage /></PrivateRoute>} />
-          <Route path="/:topicId" element={<PrivateRoute><TopicPage /></PrivateRoute>} />
-          <Route path="/:topicId/:conceptId" element={<PrivateRoute><ConceptPage /></PrivateRoute>} />
+          <Route path="/profile"    element={<PrivateRoute><Profile /></PrivateRoute>} />
+          <Route path="/quiz"       element={<PrivateRoute><QuizPage /></PrivateRoute>} />
+
+          {/* Guest-accessible — browse freely */}
+          <Route path="/leaderboard"         element={<GuestRoute><Leaderboard /></GuestRoute>} />
+          <Route path="/:topicId"            element={<GuestRoute><TopicPage /></GuestRoute>} />
+          <Route path="/:topicId/:conceptId" element={<GuestRoute><ConceptPage /></GuestRoute>} />
 
           {/* Fallback */}
           <Route path="*" element={<Navigate to="/" replace />} />

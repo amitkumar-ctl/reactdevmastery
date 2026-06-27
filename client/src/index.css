@@ -4,24 +4,18 @@
 
 html {
   height: 100%;
-  /* Prevent iOS bounce/overscroll on the document itself */
-  overscroll-behavior: none;
 }
 
 body {
   height: 100%;
-  overflow: hidden;
   font-family: 'Fira Code', 'Courier New', monospace;
   background: #0a0e1a;
   color: #e2e8f0;
   -webkit-font-smoothing: antialiased;
-  /* Prevent pull-to-refresh interfering with the app shell */
-  overscroll-behavior-y: contain;
 }
 
 #root {
   height: 100%;
-  overflow: hidden;
 }
 
 ::-webkit-scrollbar { width: 4px; height: 4px; }

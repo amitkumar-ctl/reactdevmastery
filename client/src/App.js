@@ -18,6 +18,7 @@ import PrivacyPolicy from './pages/legal/PrivacyPolicy';
 import TermsOfService from './pages/legal/TermsOfService';
 import GuestBanner from './components/guest/GuestBanner';
 import LandingPage from './pages/LandingPage';
+import Search from './components/search/Search';
 import logoMaster from './assets/logo-master.svg';
 
 // ── Loading screen ─────────────────────────────────────────────────────
@@ -89,11 +90,35 @@ const PublicRoute = ({ children }) => {
   return children;
 };
 
+// ── Search provider — mounts Cmd+K globally ────────────────────────────
+const SearchProvider = ({ children }) => {
+  const [searchOpen, setSearchOpen] = React.useState(false);
+
+  React.useEffect(() => {
+    const handler = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setSearchOpen(prev => !prev);
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, []);
+
+  return (
+    <>
+      {children}
+      {searchOpen && <Search onClose={() => setSearchOpen(false)} />}
+    </>
+  );
+};
+
 // ── App ────────────────────────────────────────────────────────────────
 const App = () => (
   <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID || 'placeholder'}>
     <AuthProvider>
       <BrowserRouter>
+        <SearchProvider>
         <Toaster
           position="bottom-right"
           toastOptions={{
@@ -118,10 +143,10 @@ const App = () => (
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/terms"   element={<TermsOfService />} />
 
-          {/* Root: logged-in → Dashboard, guest → /js-core */}
+          {/* Root: logged-in → Dashboard, guest → Landing page */}
           <Route path="/" element={<RootRoute />} />
 
-          {/* Protected — require login, guests redirected to /js-core */}
+          {/* Protected — require login */}
           <Route path="/flashcards" element={<PrivateRoute><FlashCards /></PrivateRoute>} />
           <Route path="/profile"    element={<PrivateRoute><Profile /></PrivateRoute>} />
           <Route path="/quiz"       element={<PrivateRoute><QuizPage /></PrivateRoute>} />
@@ -134,6 +159,7 @@ const App = () => (
           {/* Fallback */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
+        </SearchProvider>
       </BrowserRouter>
     </AuthProvider>
   </GoogleOAuthProvider>

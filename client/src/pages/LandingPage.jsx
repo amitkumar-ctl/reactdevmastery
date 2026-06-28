@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import styles from './LandingPage.module.css';
 import SignupPrompt from '../components/guest/SignupPrompt';
+import Search from '../components/search/Search';
 import logoIcon from '../assets/icon-transparent-white.svg';
 
 const FEATURES = [
@@ -55,6 +56,7 @@ const TOPIC_PREVIEWS = [
 const LandingPage = () => {
   const navigate = useNavigate();
   const [promptOpen, setPromptOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
 
   return (
     <div className={styles.page}>
@@ -68,6 +70,9 @@ const LandingPage = () => {
           <span className={styles.headerLogoText}>REACTDEVMASTERY</span>
         </div>
         <div className={styles.headerActions}>
+          <button className={styles.headerSearch} onClick={() => setSearchOpen(true)} aria-label="Search">
+            🔍
+          </button>
           <Link to="/login" className={styles.btnLogin}>Log in</Link>
           <Link to="/register" className={styles.btnSignup}>Sign up free →</Link>
         </div>
@@ -169,12 +174,7 @@ const LandingPage = () => {
         <Link to="/terms">Terms of Service</Link>
       </footer>
 
-      {/* Signup prompt modal (used by sidebar protected items) */}
-      {promptOpen && (
-        <SignupPrompt isGuest={true} feature="access this feature">
-          <button style={{ display: 'none' }} />
-        </SignupPrompt>
-      )}
+      {searchOpen && <Search onClose={() => setSearchOpen(false)} />}
     </div>
   );
 };

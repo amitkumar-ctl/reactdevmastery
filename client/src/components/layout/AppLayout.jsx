@@ -8,6 +8,7 @@ import styles from './Layout.module.css';
 import logoIcon from '../../assets/icon-transparent-white.svg';
 import OnboardingFlow from '../onboarding/OnboardingFlow';
 import SignupPrompt from '../guest/SignupPrompt';
+import Search from '../search/Search';
 
 // Routes that require login — clicking these as a guest shows SignupPrompt
 const PROTECTED_IDS = new Set(['home', 'flashcards', 'quiz', 'profile']);
@@ -19,7 +20,8 @@ const AppLayout = ({ children }) => {
   const location = useLocation();
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
-  const [guestPrompt, setGuestPrompt] = useState(null); // feature label string or null
+  const [guestPrompt, setGuestPrompt] = useState(null);
+  const [searchOpen, setSearchOpen] = useState(false); // feature label string or null
 
   const isGuest = !user;
   const currentPath = location.pathname.split('/').filter(Boolean)[0] || 'home';
@@ -69,6 +71,13 @@ const AppLayout = ({ children }) => {
           <img src={logoIcon} alt="" className={styles.mobileLogoIcon} />
           <span>REACTDEVMASTERY</span>
         </div>
+        <button
+          className={styles.mobileSearchBtn}
+          onClick={() => setSearchOpen(true)}
+          aria-label="Search"
+        >
+          🔍
+        </button>
       </header>
 
       {/* ── Mobile drawer backdrop ──────────────────────────────────── */}
@@ -93,6 +102,16 @@ const AppLayout = ({ children }) => {
               ✕
             </button>
           </div>
+
+          {/* Search button */}
+          <button
+            className={styles.sidebarSearchBtn}
+            onClick={() => setSearchOpen(true)}
+          >
+            <span>🔍</span>
+            <span>Search</span>
+            <kbd className={styles.searchKbd}>⌘K</kbd>
+          </button>
 
           {/* User pill — shows login/signup for guests */}
           {user ? (
@@ -182,10 +201,13 @@ const AppLayout = ({ children }) => {
         {children}
       </main>
 
-      {/* ── Guest signup prompt (triggered by protected nav clicks) ── */}
+      {/* ── Guest signup prompt ───────────────────────────────────── */}
       {guestPrompt && (
         <SignupPrompt isGuest={true} feature={guestPrompt} _forceOpen onClose={() => setGuestPrompt(null)} />
       )}
+
+      {/* ── Search modal ─────────────────────────────────────────── */}
+      {searchOpen && <Search onClose={() => setSearchOpen(false)} />}
     </div>
   );
 };

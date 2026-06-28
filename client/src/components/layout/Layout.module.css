@@ -320,6 +320,52 @@
   flex-shrink: 0;
 }
 
+/* ── Sidebar search button ────────────────────────────────────────────── */
+.sidebarSearchBtn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 12px;
+  margin-bottom: 12px;
+  background: #111827;
+  border: 1px solid #1e2d40;
+  border-radius: 8px;
+  color: #9ca3af;
+  font-family: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: left;
+}
+
+.sidebarSearchBtn:hover {
+  border-color: #2a3f5f;
+  color: #e2e8f0;
+}
+
+.searchKbd {
+  margin-left: auto;
+  background: #1e2d40;
+  border: 1px solid #2a3f5f;
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-size: 10px;
+  color: #6b7280;
+  font-family: inherit;
+}
+
+/* ── Mobile search button ────────────────────────────────────────────── */
+.mobileSearchBtn {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 4px 6px;
+  margin-left: auto;
+  line-height: 1;
+}
+
 /* ── Guest pill (shown in sidebar when not logged in) ─────────────────── */
 .guestPill {
   background: #111827;

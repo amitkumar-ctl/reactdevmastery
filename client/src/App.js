@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { Toaster } from 'react-hot-toast';
+import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ProgressProvider } from './context/ProgressContext';
 import AppLayout from './components/layout/AppLayout';
@@ -34,8 +35,6 @@ const LoadingScreen = () => (
 );
 
 // ── Route wrappers ─────────────────────────────────────────────────────
-
-// Root route: logged-in → Dashboard, guest → Landing page
 const RootRoute = () => {
   const { user, loading } = useAuth();
   if (loading) return <LoadingScreen />;
@@ -47,7 +46,6 @@ const RootRoute = () => {
   );
 };
 
-// Requires login — redirects guests to /js-core (not /login, so they see the product first)
 const PrivateRoute = ({ children }) => {
   const { user, loading } = useAuth();
   if (loading) return <LoadingScreen />;
@@ -59,9 +57,6 @@ const PrivateRoute = ({ children }) => {
   );
 };
 
-// Guest-accessible — renders for everyone
-// Logged-in users: full experience
-// Guests: same app shell + GuestBanner, stateful actions handled by SignupPrompt inline
 const GuestRoute = ({ children }) => {
   const { user, loading } = useAuth();
   if (loading) return <LoadingScreen />;
@@ -82,7 +77,6 @@ const GuestRoute = ({ children }) => {
   );
 };
 
-// Redirect logged-in users away from auth pages
 const PublicRoute = ({ children }) => {
   const { user, loading } = useAuth();
   if (loading) return <LoadingScreen />;
@@ -90,10 +84,8 @@ const PublicRoute = ({ children }) => {
   return children;
 };
 
-// ── Search provider — mounts Cmd+K globally ────────────────────────────
 const SearchProvider = ({ children }) => {
   const [searchOpen, setSearchOpen] = React.useState(false);
-
   React.useEffect(() => {
     const handler = (e) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
@@ -104,7 +96,6 @@ const SearchProvider = ({ children }) => {
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
   }, []);
-
   return (
     <>
       {children}
@@ -115,54 +106,50 @@ const SearchProvider = ({ children }) => {
 
 // ── App ────────────────────────────────────────────────────────────────
 const App = () => (
-  <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID || 'placeholder'}>
-    <AuthProvider>
-      <BrowserRouter>
-        <SearchProvider>
-        <Toaster
-          position="bottom-right"
-          toastOptions={{
-            style: {
-              background: '#111827', color: '#e2e8f0',
-              border: '1px solid #1e2d40',
-              fontFamily: 'Fira Code, monospace', fontSize: '13px',
-            },
-            success: { iconTheme: { primary: '#00ff88', secondary: '#111827' } },
-            error:   { iconTheme: { primary: '#ef4444', secondary: '#111827' } },
-          }}
-        />
+  <HelmetProvider>
+    <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID || 'placeholder'}>
+      <AuthProvider>
+        <BrowserRouter>
+          <SearchProvider>
+            <Toaster
+              position="bottom-right"
+              toastOptions={{
+                style: {
+                  background: '#111827', color: '#e2e8f0',
+                  border: '1px solid #1e2d40',
+                  fontFamily: 'Fira Code, monospace', fontSize: '13px',
+                },
+                success: { iconTheme: { primary: '#00ff88', secondary: '#111827' } },
+                error:   { iconTheme: { primary: '#ef4444', secondary: '#111827' } },
+              }}
+            />
 
-        <Routes>
-          {/* Auth pages — redirect logged-in users away */}
-          <Route path="/forgot-password"       element={<PublicRoute><ForgotPasswordPage /></PublicRoute>} />
-          <Route path="/reset-password/:token" element={<PublicRoute><ResetPasswordPage /></PublicRoute>} />
-          <Route path="/login"                 element={<PublicRoute><LoginPage /></PublicRoute>} />
-          <Route path="/register"              element={<PublicRoute><RegisterPage /></PublicRoute>} />
+            <Routes>
+              <Route path="/forgot-password"       element={<PublicRoute><ForgotPasswordPage /></PublicRoute>} />
+              <Route path="/reset-password/:token" element={<PublicRoute><ResetPasswordPage /></PublicRoute>} />
+              <Route path="/login"                 element={<PublicRoute><LoginPage /></PublicRoute>} />
+              <Route path="/register"              element={<PublicRoute><RegisterPage /></PublicRoute>} />
 
-          {/* Always public — legal */}
-          <Route path="/privacy" element={<PrivacyPolicy />} />
-          <Route path="/terms"   element={<TermsOfService />} />
+              <Route path="/privacy" element={<PrivacyPolicy />} />
+              <Route path="/terms"   element={<TermsOfService />} />
 
-          {/* Root: logged-in → Dashboard, guest → Landing page */}
-          <Route path="/" element={<RootRoute />} />
+              <Route path="/" element={<RootRoute />} />
 
-          {/* Protected — require login */}
-          <Route path="/flashcards" element={<PrivateRoute><FlashCards /></PrivateRoute>} />
-          <Route path="/profile"    element={<PrivateRoute><Profile /></PrivateRoute>} />
-          <Route path="/quiz"       element={<PrivateRoute><QuizPage /></PrivateRoute>} />
+              <Route path="/flashcards" element={<PrivateRoute><FlashCards /></PrivateRoute>} />
+              <Route path="/profile"    element={<PrivateRoute><Profile /></PrivateRoute>} />
+              <Route path="/quiz"       element={<PrivateRoute><QuizPage /></PrivateRoute>} />
 
-          {/* Guest-accessible — browse freely */}
-          <Route path="/leaderboard"         element={<GuestRoute><Leaderboard /></GuestRoute>} />
-          <Route path="/:topicId"            element={<GuestRoute><TopicPage /></GuestRoute>} />
-          <Route path="/:topicId/:conceptId" element={<GuestRoute><ConceptPage /></GuestRoute>} />
+              <Route path="/leaderboard"         element={<GuestRoute><Leaderboard /></GuestRoute>} />
+              <Route path="/:topicId"            element={<GuestRoute><TopicPage /></GuestRoute>} />
+              <Route path="/:topicId/:conceptId" element={<GuestRoute><ConceptPage /></GuestRoute>} />
 
-          {/* Fallback */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-        </SearchProvider>
-      </BrowserRouter>
-    </AuthProvider>
-  </GoogleOAuthProvider>
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </SearchProvider>
+        </BrowserRouter>
+      </AuthProvider>
+    </GoogleOAuthProvider>
+  </HelmetProvider>
 );
 
 export default App;

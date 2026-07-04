@@ -27,7 +27,6 @@ export const TopicPage = () => {
           <div className={styles.topicTitle}>{topic.title}</div>
           <div className={styles.topicMeta}>
             <span className={styles.tag} style={{ color: '#4facfe', borderColor: '#0a2d5f', background: '#05152a' }}>{topic.items.length} concepts</span>
-            <span className={styles.tag} style={{ color: '#00ff88', borderColor: '#0a4420', background: '#052210' }}>AI Explanations</span>
             {completedTopics.includes(topicId) && <span className={styles.tag} style={{ color: '#00ff88', borderColor: '#0a4420', background: '#052210' }}>✓ Complete</span>}
           </div>
         </div>
@@ -326,33 +325,33 @@ const QuizTab = ({ item, topicId, onAnswer, onCorrect, isGuest = false }) => {
     setSelected(wasDone ? (selectedAnswers[newIdx] ?? null) : null);
   };
 
-  const genAIQuiz = async () => {
-    setGeneratingAI(true);
-    try {
-      const { data } = await api.post('/ai/chat', {
-        messages: [{ role: 'user', content: `Generate a challenging multiple-choice quiz question about "${item.title}" for a senior frontend engineer interview. Return ONLY valid JSON (no markdown, no backticks):\n{"q":"question text","opts":["A","B","C","D"],"correct":0,"explain":"why correct"}` }],
-      });
-      const text = data.content[0].text.replace(/```json\n?/g,'').replace(/```\n?/g,'').trim();
-      const newQ = JSON.parse(text);
-      setQuizzes(prev => [...prev, newQ]);
-      setIdx(quizzes.length);
-      setAnswered(false);
-      setSelected(null);
-    } catch (e) {
-      alert('Error generating quiz: ' + e.message);
-    } finally {
-      setGeneratingAI(false);
-    }
-  };
+  // const genAIQuiz = async () => {
+  //   setGeneratingAI(true);
+  //   try {
+  //     const { data } = await api.post('/ai/chat', {
+  //       messages: [{ role: 'user', content: `Generate a challenging multiple-choice quiz question about "${item.title}" for a senior frontend engineer interview. Return ONLY valid JSON (no markdown, no backticks):\n{"q":"question text","opts":["A","B","C","D"],"correct":0,"explain":"why correct"}` }],
+  //     });
+  //     const text = data.content[0].text.replace(/```json\n?/g,'').replace(/```\n?/g,'').trim();
+  //     const newQ = JSON.parse(text);
+  //     setQuizzes(prev => [...prev, newQ]);
+  //     setIdx(quizzes.length);
+  //     setAnswered(false);
+  //     setSelected(null);
+  //   } catch (e) {
+  //     alert('Error generating quiz: ' + e.message);
+  //   } finally {
+  //     setGeneratingAI(false);
+  //   }
+  // };
 
-  if (!q) return (
-    <div className={styles.panel}>
-      <p className={styles.muted}>No quiz yet for this topic.</p>
-      <button className={styles.btnPrimary} style={{ marginTop: 12 }} onClick={genAIQuiz} disabled={generatingAI}>
-        {generatingAI ? '⏳ Generating...' : '🤖 Generate AI Quiz'}
-      </button>
-    </div>
-  );
+  // if (!q) return (
+  //   <div className={styles.panel}>
+  //     <p className={styles.muted}>No quiz yet for this topic.</p>
+  //     <button className={styles.btnPrimary} style={{ marginTop: 12 }} onClick={genAIQuiz} disabled={generatingAI}>
+  //       {generatingAI ? '⏳ Generating...' : '🤖 Generate AI Quiz'}
+  //     </button>
+  //   </div>
+  // );
 
   return (
     <div className={styles.lessonWrap}>
@@ -416,11 +415,11 @@ const QuizTab = ({ item, topicId, onAnswer, onCorrect, isGuest = false }) => {
           )}
 
           {/* Add AI question only on last question after answering */}
-          {idx === quizzes.length - 1 && answered && (
+          {/* {idx === quizzes.length - 1 && answered && (
             <button className={styles.btn} onClick={genAIQuiz} disabled={generatingAI} style={{ marginLeft: 'auto' }}>
               {generatingAI ? '⏳' : '+ AI Question'}
             </button>
-          )}
+          )} */}
         </div>
       </div>
     </div>

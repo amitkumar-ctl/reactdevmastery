@@ -2,7 +2,6 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { Toaster } from 'react-hot-toast';
-import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ProgressProvider } from './context/ProgressContext';
 import AppLayout from './components/layout/AppLayout';
@@ -106,7 +105,6 @@ const SearchProvider = ({ children }) => {
 
 // ── App ────────────────────────────────────────────────────────────────
 const App = () => (
-  <HelmetProvider>
     <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID || 'placeholder'}>
       <AuthProvider>
         <BrowserRouter>
@@ -149,7 +147,6 @@ const App = () => (
         </BrowserRouter>
       </AuthProvider>
     </GoogleOAuthProvider>
-  </HelmetProvider>
 );
 
 export default App;

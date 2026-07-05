@@ -102,9 +102,9 @@ export const ConceptPage = () => {
       </div>
 
       <div className={styles.tabBar}>
-        {['learn', 'quiz', 'faq'].map(t => (
+        {['learn', 'quiz', 'faq', 'map'].map(t => (
           <button key={t} className={`${styles.tabBtn} ${tab === t ? styles.tabActive : ''}`} onClick={() => setTab(t)}>
-            {t === 'learn' ? '📖 Learn' : t === 'quiz' ? '🎯 Quiz' : '💬 FAQ'}
+            {t === 'learn' ? '📖 Learn' : t === 'quiz' ? '🎯 Quiz' : t === 'faq' ? '💬 FAQ' : '🔗 Concept Map'}
           </button>
         ))}
       </div>
@@ -120,7 +120,14 @@ export const ConceptPage = () => {
             onCorrect={() => markConceptDone(item.id, topicId, allIds)}
           />
         )}
-        {tab === 'faq' && <FAQTab item={item} />}
+        {tab === 'map' && (
+          <div className={styles.content}>
+            <ConceptConnections
+              conceptId={item.id}
+              completedConcepts={completedConcepts}
+            />
+          </div>
+        )}
       </div>
     </div>
   );
@@ -128,7 +135,6 @@ export const ConceptPage = () => {
 
 
 const LearnTab = ({ item, topicId }) => {
-  const { completedConcepts } = useProgress();
   const VisComponent = VISUALIZERS[item.id];
   const LearnComponent = LEARN_COMPONENTS[item.id];
   const content = CONTENT[item.id];
@@ -203,11 +209,6 @@ const LearnTab = ({ item, topicId }) => {
           </div>
         </div>
       )}
-
-      <ConceptConnections
-        conceptId={item.id}
-        completedConcepts={completedConcepts}
-      />
 
     </div>
   );

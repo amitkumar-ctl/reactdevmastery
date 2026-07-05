@@ -63,6 +63,7 @@ const userSchema = new mongoose.Schema(
     streak: { type: Number, default: 0 },
     lastActiveDate: { type: String, default: null }, // 'YYYY-MM-DD'
     activityLog: { type: Map, of: Number, default: {} },
+    lastDailyCompleted: { type: String, default: null }, // 'YYYY-MM-DD'
 
     // ── Account ──────────────────────────────────────────
     isVerified: { type: Boolean, default: false },
@@ -147,6 +148,7 @@ userSchema.methods.toPublicJSON = function () {
     streak: this.streak,
     lastActiveDate: this.lastActiveDate,
     activityLog: Object.fromEntries(this.activityLog || new Map()),
+    lastDailyCompleted: this.lastDailyCompleted,
     completedConcepts: this.completedConcepts,
     completedTopics: this.completedTopics,
     flashCardsSeen: this.flashCardsSeen,

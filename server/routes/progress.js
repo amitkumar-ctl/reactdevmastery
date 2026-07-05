@@ -116,6 +116,49 @@ router.post('/flash', async (req, res, next) => {
   }
 });
 
+// ── POST /api/progress/daily ──────────────────────────────────────────
+// Mark today's daily challenge as completed
+router.post('/daily', async (req, res, next) => {
+  try {
+    const { conceptId, topicId, score, total } = req.body;
+    if (!conceptId || !topicId) {
+      return res.status(400).json({ message: 'conceptId and topicId are required' });
+    }
+
+    const today = new Date().toISOString().slice(0, 10);
+    const user = await User.findById(req.user._id);
+
+    if (user.lastDailyCompleted === today) {
+      return res.json({ success: true, alreadyDone: true, user: user.toPublicJSON() });
+    }
+
+    // Mark concept complete if not already done
+    const alreadyDone = user.completedConcepts.some(c => c.conceptId === conceptId);
+    if (!alreadyDone) {
+      user.completedConcepts.push({ conceptId, topicId });
+    }
+
+    // Record quiz attempts
+    if (typeof score === 'number' && typeof total === 'number') {
+      user.quizCorrect += score;
+      user.quizTotal += total;
+    }
+
+    // Mark daily done and update streak
+    user.lastDailyCompleted = today;
+    user.updateStreak();
+
+    // Bump activity log
+    user.activityLog = user.activityLog || new Map();
+    user.activityLog.set(today, (user.activityLog.get(today) || 0) + 1);
+
+    await user.save();
+    res.json({ success: true, alreadyDone: false, user: user.toPublicJSON() });
+  } catch (err) {
+    next(err);
+  }
+});
+
 // ── DELETE /api/progress/reset ────────────────────────────────────────
 // Reset all progress (confirm before calling)
 router.delete('/reset', async (req, res, next) => {

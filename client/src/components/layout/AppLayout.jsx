@@ -11,7 +11,7 @@ import SignupPrompt from '../guest/SignupPrompt';
 import Search from '../search/Search';
 
 // Routes that require login — clicking these as a guest shows SignupPrompt
-const PROTECTED_IDS = new Set(['home', 'flashcards', 'quiz', 'profile']);
+const PROTECTED_IDS = new Set(['home', 'flashcards', 'quiz', 'profile', 'leaderboard', 'daily']);
 
 const AppLayout = ({ children }) => {
   const { user, logout } = useAuth();
@@ -45,6 +45,8 @@ const AppLayout = ({ children }) => {
         flashcards: 'use Flash Cards',
         quiz: 'take the Quiz',
         profile: 'view your Profile',
+        leaderboard: 'view the Leaderboard',
+        daily: 'access the Daily Challenge',
       };
       setGuestPrompt(labels[topicId] || 'use this feature');
       return;
@@ -156,6 +158,19 @@ const AppLayout = ({ children }) => {
               </div>
             </div>
           )}
+        </div>
+
+        {/* Daily Challenge entry */}
+        <div
+          className={`${styles.navItem} ${currentPath === 'daily' ? styles.navItemActive : ''}`}
+          onClick={() => handleNavClick('daily', '/daily')}
+        >
+          <span className={styles.navIcon}>🎯</span>
+          <span className={styles.navLabel}>Daily Challenge</span>
+          {user?.lastDailyCompleted === new Date().toISOString().slice(0, 10)
+            ? <span style={{ color: '#00ff88', fontSize: 11 }}>✓</span>
+            : <span className={styles.badge} style={{ background: '#4facfe20', color: '#4facfe', borderColor: '#4facfe40' }}>NEW</span>
+          }
         </div>
 
         {/* Nav */}

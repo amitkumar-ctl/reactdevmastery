@@ -14,6 +14,7 @@ import Profile from './pages/Profile';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ResetPasswordPage  from './pages/ResetPasswordPage';
 import QuizPage from './pages/QuizPage';
+import DailyChallenge from './pages/DailyChallenge';
 import PrivacyPolicy from './pages/legal/PrivacyPolicy';
 import TermsOfService from './pages/legal/TermsOfService';
 import GuestBanner from './components/guest/GuestBanner';
@@ -138,6 +139,7 @@ const App = () => (
               <Route path="/quiz"       element={<PrivateRoute><QuizPage /></PrivateRoute>} />
 
               <Route path="/leaderboard"         element={<GuestRoute><Leaderboard /></GuestRoute>} />
+              <Route path="/daily"               element={<GuestRoute><DailyChallenge /></GuestRoute>} />
               <Route path="/:topicId"            element={<GuestRoute><TopicPage /></GuestRoute>} />
               <Route path="/:topicId/:conceptId" element={<GuestRoute><ConceptPage /></GuestRoute>} />
 

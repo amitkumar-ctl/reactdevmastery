@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useProgress } from '../context/ProgressContext';
 import { CONCEPTS, QUIZZES, CONTENT, CHALLENGES, FAQS } from 'reactdevmastery-content/data';
 import { LEARN_COMPONENTS, VISUALIZERS } from 'reactdevmastery-content/components';
+import ConceptConnections from '../components/concept/ConceptConnections';
 import styles from './TopicPage.module.css';
 import SignupPrompt from '../components/guest/SignupPrompt';
 
@@ -127,24 +128,25 @@ export const ConceptPage = () => {
 
 
 const LearnTab = ({ item, topicId }) => {
+  const { completedConcepts } = useProgress();
   const VisComponent = VISUALIZERS[item.id];
   const LearnComponent = LEARN_COMPONENTS[item.id];
   const content = CONTENT[item.id];
   const faqs = FAQS[item.id];
 
   const docLinks = {
-    'event-loop':        { label: 'MDN — Event Loop', url: 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Event_loop' },
-    'closure-def':       { label: 'MDN — Closures', url: 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Closures' },
-    'hoisting':          { label: 'MDN — Hoisting', url: 'https://developer.mozilla.org/en-US/docs/Glossary/Hoisting' },
-    'this-keyword':      { label: 'MDN — this', url: 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/this' },
+    'event-loop': { label: 'MDN — Event Loop', url: 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Event_loop' },
+    'closure-def': { label: 'MDN — Closures', url: 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Closures' },
+    'hoisting': { label: 'MDN — Hoisting', url: 'https://developer.mozilla.org/en-US/docs/Glossary/Hoisting' },
+    'this-keyword': { label: 'MDN — this', url: 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/this' },
     'promise-internals': { label: 'MDN — Promise', url: 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise' },
-    'async-await':       { label: 'MDN — async function', url: 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function' },
-    'scope-chain':       { label: 'MDN — Scope', url: 'https://developer.mozilla.org/en-US/docs/Glossary/Scope' },
-    'fiber':             { label: 'React Docs — Reconciliation', url: 'https://react.dev/learn/preserving-and-resetting-state' },
-    'useeffect-deep':    { label: 'React Docs — useEffect', url: 'https://react.dev/reference/react/useEffect' },
-    'cwv':               { label: 'web.dev — Core Web Vitals', url: 'https://web.dev/vitals/' },
-    'xss':               { label: 'MDN — XSS', url: 'https://developer.mozilla.org/en-US/docs/Glossary/Cross-site_scripting' },
-    'memory':            { label: 'MDN — Memory Management', url: 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Memory_management' },
+    'async-await': { label: 'MDN — async function', url: 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function' },
+    'scope-chain': { label: 'MDN — Scope', url: 'https://developer.mozilla.org/en-US/docs/Glossary/Scope' },
+    'fiber': { label: 'React Docs — Reconciliation', url: 'https://react.dev/learn/preserving-and-resetting-state' },
+    'useeffect-deep': { label: 'React Docs — useEffect', url: 'https://react.dev/reference/react/useEffect' },
+    'cwv': { label: 'web.dev — Core Web Vitals', url: 'https://web.dev/vitals/' },
+    'xss': { label: 'MDN — XSS', url: 'https://developer.mozilla.org/en-US/docs/Glossary/Cross-site_scripting' },
+    'memory': { label: 'MDN — Memory Management', url: 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Memory_management' },
   };
 
   const doc = docLinks[item.id];
@@ -201,6 +203,11 @@ const LearnTab = ({ item, topicId }) => {
           </div>
         </div>
       )}
+
+      <ConceptConnections
+        conceptId={item.id}
+        completedConcepts={completedConcepts}
+      />
 
     </div>
   );
@@ -490,9 +497,9 @@ const ChallengeTab = ({ item }) => {
         <div className={styles.sectionTitle}>How did you do?</div>
         <div style={{ display: 'flex', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
           {[
-            { v: 'stuck',   label: '😰 Got stuck',       color: '#ef4444' },
+            { v: 'stuck', label: '😰 Got stuck', color: '#ef4444' },
             { v: 'partial', label: '🤔 Partial solution', color: '#eab308' },
-            { v: 'solved',  label: '💪 Solved it!',       color: '#00ff88' },
+            { v: 'solved', label: '💪 Solved it!', color: '#00ff88' },
           ].map(r => (
             <button
               key={r.v}

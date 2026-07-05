@@ -1,0 +1,99 @@
+.wrap {
+  background: #0d1829;
+  border: 1px solid #1e2d40;
+  border-radius: 14px;
+  padding: 16px;
+  margin-top: 16px;
+}
+
+.title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 14px;
+}
+
+.section {
+  margin-bottom: 14px;
+}
+.section:last-child { margin-bottom: 0; }
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.arrow {
+  font-size: 13px;
+  font-weight: 700;
+  color: '#4facfe';
+  color: #4facfe;
+  width: 16px;
+  text-align: center;
+}
+
+.sectionTitle {
+  font-size: 12px;
+  font-weight: 600;
+  color: #e2e8f0;
+}
+
+.sectionSub {
+  font-size: 11px;
+  color: #6b7280;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-left: 22px;
+}
+
+.chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  background: #111827;
+  border: 1px solid #1e2d40;
+  border-radius: 20px;
+  cursor: pointer;
+  font-family: 'Fira Code', monospace;
+  font-size: 12px;
+  color: #e2e8f0;
+  transition: border-color 0.15s, background 0.15s;
+  text-align: left;
+}
+
+.chip:hover {
+  background: #1e2d40;
+  border-color: #2a3f5f;
+}
+
+.chipDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.chipTitle {
+  font-weight: 600;
+  color: #e2e8f0;
+}
+
+.chipDone {
+  font-size: 10px;
+  color: #00ff88;
+  font-weight: 700;
+}
+
+.chipTopic {
+  font-size: 10px;
+  opacity: 0.7;
+}

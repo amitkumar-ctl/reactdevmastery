@@ -5,6 +5,7 @@ import { useProgress } from '../context/ProgressContext';
 import { CONCEPTS, QUIZZES, CONTENT, CHALLENGES, FAQS } from 'reactdevmastery-content/data';
 import { LEARN_COMPONENTS, VISUALIZERS } from 'reactdevmastery-content/components';
 import ConceptConnections from '../components/concept/ConceptConnections';
+import WhyExists from '../components/concept/WhyExists';
 import styles from './TopicPage.module.css';
 import SignupPrompt from '../components/guest/SignupPrompt';
 
@@ -102,15 +103,17 @@ export const ConceptPage = () => {
       </div>
 
       <div className={styles.tabBar}>
-        {['learn', 'quiz', 'faq', 'map'].map(t => (
+        {['learn', 'quiz', 'faq', 'map','why'].map(t => (
           <button key={t} className={`${styles.tabBtn} ${tab === t ? styles.tabActive : ''}`} onClick={() => setTab(t)}>
-            {t === 'learn' ? '📖 Learn' : t === 'quiz' ? '🎯 Quiz' : t === 'faq' ? '💬 FAQ' : '🔗 Concept Map'}
+            {t === 'learn' ? '📖 Learn' : t === 'quiz' ? '🎯 Quiz' : t === 'faq' ? '💬 FAQ' : t === 'why' ? '💡 Why This Exists' : '🔗 Concept Map'}
           </button>
         ))}
       </div>
 
       <div className={styles.content}>
         {tab === 'learn' && <LearnTab item={item} topicId={topicId} />}
+        {tab === 'why' && <WhyExists conceptId={item.id} />}
+        {tab === 'faq' && <FAQTab item={item} /> }
         {tab === 'quiz' && (
           <QuizTab
             item={item}

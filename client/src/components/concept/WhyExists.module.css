@@ -50,7 +50,6 @@
   color: #c5cdd8;
   line-height: 1.8;
   margin: 0;
-  font-family: 'Fira Code', monospace;
 }
 
 /* ── Code block ──────────────────────────────────────────── */
@@ -83,6 +82,5 @@
   padding: 14px;
   margin: 0;
   white-space: pre-wrap;
-  font-family: 'Fira Code', monospace;
   overflow-x: auto;
 }

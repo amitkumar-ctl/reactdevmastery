@@ -45,7 +45,6 @@
   background: none;
   border: none;
   outline: none;
-  font-family: 'Fira Code', monospace;
   font-size: 15px;
   color: #e2e8f0;
   caret-color: #00ff88;
@@ -71,7 +70,6 @@
   background: #1e2d40;
   border: 1px solid #2a3f5f;
   color: #9ca3af;
-  font-family: 'Fira Code', monospace;
   font-size: 10px;
   padding: 3px 8px;
   border-radius: 5px;
@@ -108,7 +106,7 @@
 .emptyText {
   font-size: 13px;
   color: #6b7280;
-  font-family: 'Fira Code', monospace;
+   
 }
 
 .suggestions {
@@ -126,7 +124,7 @@
   padding: 5px 14px;
   font-size: 12px;
   color: #9ca3af;
-  font-family: 'Fira Code', monospace;
+   
   cursor: pointer;
   transition: all 0.15s;
 }
@@ -147,7 +145,7 @@
   text-transform: uppercase;
   color: #4b5563;
   padding: 8px 16px 4px;
-  font-family: 'Fira Code', monospace;
+   
 }
 
 /* ── Individual result ───────────────────────────────────────────────── */
@@ -161,7 +159,7 @@
   border: none;
   cursor: pointer;
   text-align: left;
-  font-family: 'Fira Code', monospace;
+   
   transition: background 0.1s;
   border-radius: 0;
 }
@@ -248,7 +246,7 @@
   display: flex;
   align-items: center;
   gap: 5px;
-  font-family: 'Fira Code', monospace;
+   
 }
 
 kbd {
@@ -258,7 +256,7 @@ kbd {
   padding: 1px 6px;
   font-size: 10px;
   color: #9ca3af;
-  font-family: 'Fira Code', monospace;
+   
 }
 
 /* ── Mobile ──────────────────────────────────────────────────────────── */

@@ -73,7 +73,7 @@
 
 /* Challenge */
 .challengeArea { background: #060910; border: 1px solid #2a3f5f; border-radius: 8px; }
-.challengeEditor { width: 100%; min-height: 180px; background: transparent; border: none; color: #a8c; font-family: 'Fira Code', monospace; font-size: 13px; padding: 16px; outline: none; resize: vertical; line-height: 1.7; }
+.challengeEditor { width: 100%; min-height: 180px; background: transparent; border: none; color: #a8c;   font-size: 13px; padding: 16px; outline: none; resize: vertical; line-height: 1.7; }
 .challengeToolbar { display: flex; gap: 8px; padding: 8px 12px; border-top: 1px solid #1e2d40; }
 
 /* Chat */

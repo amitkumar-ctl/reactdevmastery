@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState,lazy,Suspense } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import styles from './LandingPage.module.css';
 import SignupPrompt from '../components/guest/SignupPrompt';
-import Search from '../components/search/Search';
 import logoIcon from '../assets/icon-transparent-white.svg';
+const Search = lazy(() => import('../components/search/Search'));
 
 const FEATURES = [
   {
@@ -39,18 +39,18 @@ const FEATURES = [
 ];
 
 const TOPIC_PREVIEWS = [
-  { id: 'js-core',       icon: '⚡', label: 'JavaScript Internals',       count: 6,  tag: 'Foundation' },
-  { id: 'closures',      icon: '🔒', label: 'Closures & Scope',           count: 3,  tag: 'Core' },
-  { id: 'async',         icon: '⏳', label: 'Async & Promises',           count: 4,  tag: 'Core' },
-  { id: 'react-core',    icon: '⚛',  label: 'React Internals',            count: 4,  tag: 'React' },
-  { id: 'hooks',         icon: '🪝', label: 'Hooks & State',              count: 3,  tag: 'React' },
-  { id: 'ts',            icon: '📘', label: 'TypeScript Deep Dive',       count: 6,  tag: 'Language' },
-  { id: 'perf',          icon: '📊', label: 'Performance & CWV',          count: 5,  tag: 'Advanced' },
-  { id: 'security',      icon: '🔐', label: 'Security',                   count: 3,  tag: 'Advanced' },
-  { id: 'system-design', icon: '🏗',  label: 'System Design',             count: 3,  tag: 'Architecture' },
-  { id: 'patterns',      icon: '🧩', label: 'Design Patterns',            count: 10, tag: 'Architecture' },
-  { id: 'a11y',          icon: '♿', label: 'Accessibility',              count: 7,  tag: 'Frontend' },
-  { id: 'nextjs',        icon: '▲',  label: 'Next.js',                    count: 6,  tag: 'Framework' },
+  { id: 'js-core', icon: '⚡', label: 'JavaScript Internals', count: 6, tag: 'Foundation' },
+  { id: 'closures', icon: '🔒', label: 'Closures & Scope', count: 3, tag: 'Core' },
+  { id: 'async', icon: '⏳', label: 'Async & Promises', count: 4, tag: 'Core' },
+  { id: 'react-core', icon: '⚛', label: 'React Internals', count: 4, tag: 'React' },
+  { id: 'hooks', icon: '🪝', label: 'Hooks & State', count: 3, tag: 'React' },
+  { id: 'ts', icon: '📘', label: 'TypeScript Deep Dive', count: 6, tag: 'Language' },
+  { id: 'perf', icon: '📊', label: 'Performance & CWV', count: 5, tag: 'Advanced' },
+  { id: 'security', icon: '🔐', label: 'Security', count: 3, tag: 'Advanced' },
+  { id: 'system-design', icon: '🏗', label: 'System Design', count: 3, tag: 'Architecture' },
+  { id: 'patterns', icon: '🧩', label: 'Design Patterns', count: 10, tag: 'Architecture' },
+  { id: 'a11y', icon: '♿', label: 'Accessibility', count: 7, tag: 'Frontend' },
+  { id: 'nextjs', icon: '▲', label: 'Next.js', count: 6, tag: 'Framework' },
 ];
 
 const LandingPage = () => {
@@ -98,9 +98,9 @@ const LandingPage = () => {
       {/* ── Stats ──────────────────────────────────────────────────── */}
       <div className={styles.statsBar}>
         {[
-          { num: '30+',  label: 'Topics covered' },
+          { num: '30+', label: 'Topics covered' },
           { num: '900+', label: 'Concept Q&As' },
-          { num: '8',    label: 'Interview rounds' },
+          { num: '8', label: 'Interview rounds' },
           { num: '100%', label: 'Free forever' },
         ].map((s, i) => (
           <div key={i} className={styles.stat}>
@@ -174,7 +174,11 @@ const LandingPage = () => {
         <Link to="/terms">Terms of Service</Link>
       </footer>
 
-      {searchOpen && <Search onClose={() => setSearchOpen(false)} />}
+      {searchOpen && (
+        <Suspense fallback={null}>
+          <Search onClose={() => setSearchOpen(false)} />
+        </Suspense>
+      )}
     </div>
   );
 };

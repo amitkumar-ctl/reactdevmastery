@@ -77,7 +77,7 @@ const LandingPage = () => {
           <Link to="/register" className={styles.btnSignup}>Sign up free →</Link>
         </div>
       </header>
-
+      <main>
       {/* ── Hero ───────────────────────────────────────────────────── */}
       <section className={styles.hero}>
         <div className={styles.heroBadge}>Senior Frontend Interview Prep</div>
@@ -166,6 +166,7 @@ const LandingPage = () => {
           </button>
         </div>
       </section>
+      </main>
 
       {/* ── Footer ─────────────────────────────────────────────────── */}
       <footer className={styles.footer}>

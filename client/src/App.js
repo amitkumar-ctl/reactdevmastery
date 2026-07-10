@@ -20,6 +20,7 @@ import TermsOfService from './pages/legal/TermsOfService';
 import GuestBanner from './components/guest/GuestBanner';
 import LandingPage from './pages/LandingPage';
 import Search from './components/search/Search';
+import TimeLine from './pages/TimeLine';
 import logoMaster from './assets/logo-master.svg';
 
 // ── Loading screen ─────────────────────────────────────────────────────
@@ -142,6 +143,7 @@ const App = () => (
               <Route path="/daily"               element={<GuestRoute><DailyChallenge /></GuestRoute>} />
               <Route path="/:topicId"            element={<GuestRoute><TopicPage /></GuestRoute>} />
               <Route path="/:topicId/:conceptId" element={<GuestRoute><ConceptPage /></GuestRoute>} />
+              <Route path="/timeline" element={<GuestRoute><TimeLine /></GuestRoute>} />
 
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>

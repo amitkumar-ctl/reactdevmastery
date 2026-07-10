@@ -173,6 +173,15 @@ const AppLayout = ({ children }) => {
           }
         </div>
 
+        {/* Timeline entry */}
+        <div
+          className={`${styles.navItem} ${currentPath === 'timeline' ? styles.navItemActive : ''}`}
+          onClick={() => navigate('/timeline')}
+        >
+          <span className={styles.navIcon}>📅</span>
+          <span className={styles.navLabel}>React History</span>
+        </div>
+
         {/* Nav */}
         <nav className={styles.nav}>
           {(() => {

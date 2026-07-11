@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useProgress } from '../../context/ProgressContext';
 import { TOPICS, LEARNABLE_IDS } from 'reactdevmastery-content/data';
@@ -69,7 +69,7 @@ const AppLayout = ({ children }) => {
         >
           ☰
         </button>
-        <div className={styles.mobileLogo}>
+        <div className={styles.mobileLogo} onClick={()=> navigate('/')}>
           <img src={logoIcon} alt="" className={styles.mobileLogoIcon} />
           <span>REACTDEVMASTERY</span>
         </div>
@@ -90,7 +90,7 @@ const AppLayout = ({ children }) => {
       {/* ── Sidebar ─────────────────────────────────────────────── */}
       <aside className={`${styles.sidebar} ${mobileNavOpen ? styles.sidebarOpen : ''}`}>
         <div className={styles.sidebarHeader}>
-          <div className={styles.logo}>
+          <div className={styles.logo} onClick={()=> navigate('/')}>
             <div className={styles.logoIcon}><img src={logoIcon} alt="" style={{ width: '60%', height: '60%' }} /></div>
             <div>
               <div className={styles.logoText}>REACTDEVMASTERY</div>

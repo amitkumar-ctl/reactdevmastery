@@ -18,6 +18,7 @@
 .authLogo {
   display: flex;
   align-items: center;
+  cursor: pointer;
   gap: 12px;
   margin-bottom: 32px;
 }

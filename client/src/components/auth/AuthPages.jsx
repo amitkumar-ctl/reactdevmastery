@@ -41,7 +41,7 @@ export const LoginPage = () => {
   return (
     <div className={styles.authPage}>
       <div className={styles.authCard}>
-        <div className={styles.authLogo}>
+        <div className={styles.authLogo} onClick={()=> navigate('/')}>
           <div className={styles.logoIcon}><img src={logoIcon} alt="" style={{ width: '60%', height: '60%' }} /></div>
           <div>
             <div className={styles.logoText}>REACTDEVMASTERY</div>

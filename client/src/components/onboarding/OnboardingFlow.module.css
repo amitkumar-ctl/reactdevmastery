@@ -271,7 +271,7 @@
   background: none;
   border: none;
   color: #6b7280;
-  font-size: 12px;
+  font-size: 14px;
   font-family: inherit;
   cursor: pointer;
   padding: 8px 0;
@@ -295,7 +295,7 @@
 
   .option { padding: 12px 14px; }
 
-  .optionLabel { font-size: 12px; }
+  .optionLabel { font-size: 14px; }
 
-  .btnPrimary { font-size: 12px; padding: 13px; }
+  .btnPrimary { font-size: 14px; padding: 13px; }
 }

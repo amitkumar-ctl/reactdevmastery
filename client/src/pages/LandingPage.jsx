@@ -1,4 +1,4 @@
-import React, { useState,lazy,Suspense } from 'react';
+import React, { useState, lazy, Suspense } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import styles from './LandingPage.module.css';
 import SignupPrompt from '../components/guest/SignupPrompt';
@@ -53,6 +53,14 @@ const TOPIC_PREVIEWS = [
   { id: 'nextjs', icon: '▲', label: 'Next.js', count: 6, tag: 'Framework' },
 ];
 
+const STATS = [
+  { num: '226', label: 'Deep-dive concepts', sub: 'Across 34 topics', color: '#4facfe', icon: '🧠', tag: 'concepts' },
+  { num: '906', label: 'Interview Q&As', sub: 'Senior-level answers', color: '#00c853', icon: '💬', tag: 'Q&As' },
+  { num: '20', label: 'Live visualizers', sub: 'Watch concepts animate', color: '#a855f7', icon: '▶', tag: 'live', pulse: true },
+  { num: '8', label: 'Interview rounds', sub: 'JS, React, System Design…', color: '#f97316', icon: '🎯', tag: 'rounds' },
+  { num: 'Free', label: 'No paywall, ever', sub: 'No credit card needed', color: '#ef4444', icon: '🔓', tag: 'always' },
+];
+
 const LandingPage = () => {
   const navigate = useNavigate();
   const [promptOpen, setPromptOpen] = useState(false);
@@ -78,94 +86,97 @@ const LandingPage = () => {
         </div>
       </header>
       <main>
-      {/* ── Hero ───────────────────────────────────────────────────── */}
-      <section className={styles.hero}>
-        <div className={styles.heroBadge}>Senior Frontend Interview Prep</div>
-        <h1 className={styles.heroTitle}>
-          Go from mid-level to<br /><span>senior engineer</span>
-        </h1>
-        <p className={styles.heroSub}>
-          Interactive visualizers, real interview rounds, and 900+ concept-level Q&As
-          built specifically for engineers targeting senior frontend roles.
-          Free, forever.
-        </p>
-        <div className={styles.heroActions}>
-          <Link to="/register" className={styles.heroCta}>Start learning free →</Link>
-          <Link to="/js-core" className={styles.heroExplore}>Explore content</Link>
-        </div>
-      </section>
-
-      {/* ── Stats ──────────────────────────────────────────────────── */}
-      <div className={styles.statsBar}>
-        {[
-          { num: '30+', label: 'Topics covered' },
-          { num: '900+', label: 'Concept Q&As' },
-          { num: '8', label: 'Interview rounds' },
-          { num: '100%', label: 'Free forever' },
-        ].map((s, i) => (
-          <div key={i} className={styles.stat}>
-            <div className={styles.statNum}>{s.num}</div>
-            <div className={styles.statLabel}>{s.label}</div>
+        {/* ── Hero ───────────────────────────────────────────────────── */}
+        <section className={styles.hero}>
+          <div className={styles.heroBadge}>Senior Frontend Interview Prep</div>
+          <h1 className={styles.heroTitle}>
+            Go from mid-level to<br /><span>senior engineer</span>
+          </h1>
+          <p className={styles.heroSub}>
+            Interactive visualizers, real interview rounds, and 900+ concept-level Q&As
+            built specifically for engineers targeting senior frontend roles.
+            Free, forever.
+          </p>
+          <div className={styles.heroActions}>
+            <Link to="/register" className={styles.heroCta}>Start learning free →</Link>
+            <Link to="/js-core" className={styles.heroExplore}>Explore content</Link>
           </div>
-        ))}
-      </div>
+        </section>
 
-      {/* ── Features ───────────────────────────────────────────────── */}
-      <section className={styles.features}>
-        <div className={styles.sectionTitle}>What's inside</div>
-        <h2 className={styles.sectionHeading}>Everything you need for a senior interview</h2>
-        <div className={styles.featureGrid}>
-          {FEATURES.map((f, i) => (
-            <div key={i} className={styles.featureCard}>
-              <div className={styles.featureIcon}>{f.icon}</div>
-              <div className={styles.featureTitle}>{f.title}</div>
-              <div className={styles.featureSub}>{f.sub}</div>
+
+        <div className={styles.statsGrid}>
+          {STATS.map((s, i) => (
+            <div key={i} className={styles.statCard} style={{ '--accent': s.color, animationDelay: `${i * 0.1}s` }}>
+              <div className={styles.statTop}>
+                <div className={styles.statIcon} style={{ background: s.color + '20' }}>{s.icon}</div>
+                <span className={styles.statTag} style={{ color: s.color, background: s.color + '15' }}>
+                  {s.pulse && <span className={styles.pulseDot} style={{ background: s.color }} />}
+                  {s.tag}
+                </span>
+              </div>
+              <span className={styles.statNum} style={{ color: s.color }}>{s.num}</span>
+              <span className={styles.statLabel}>{s.label}</span>
+              <span className={styles.statSub}>{s.sub}</span>
             </div>
           ))}
         </div>
-      </section>
 
-      {/* ── Topics preview ─────────────────────────────────────────── */}
-      <section className={styles.topics}>
-        <div className={styles.sectionTitle}>Topics</div>
-        <h2 className={styles.sectionHeading}>Browse the curriculum</h2>
-        <p className={styles.sectionSub}>Click any topic to start reading — no account needed.</p>
-        <div className={styles.topicGrid}>
-          {TOPIC_PREVIEWS.map(t => (
-            <Link key={t.id} to={`/${t.id}`} className={styles.topicCard}>
-              <div className={styles.topicCardTop}>
-                <span className={styles.topicCardIcon}>{t.icon}</span>
-                <span className={styles.topicCardTag}>{t.tag}</span>
+        {/* ── Features ───────────────────────────────────────────────── */}
+        <section className={styles.features}>
+          <div className={styles.sectionTitle}>What's inside</div>
+          <h2 className={styles.sectionHeading}>Everything you need for a senior interview</h2>
+          <div className={styles.featureGrid}>
+            {FEATURES.map((f, i) => (
+              <div key={i} className={styles.featureCard}>
+                <div className={styles.featureIcon}>{f.icon}</div>
+                <div className={styles.featureTitle}>{f.title}</div>
+                <div className={styles.featureSub}>{f.sub}</div>
               </div>
-              <div className={styles.topicCardLabel}>{t.label}</div>
-              <div className={styles.topicCardFooter}>
-                <span className={styles.topicCardCount}>{t.count} concepts</span>
-                <span className={styles.topicCardArrow}>→</span>
-              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* ── Topics preview ─────────────────────────────────────────── */}
+        <section className={styles.topics}>
+          <div className={styles.sectionTitle}>Topics</div>
+          <h2 className={styles.sectionHeading}>Browse the curriculum</h2>
+          <p className={styles.sectionSub}>Click any topic to start reading — no account needed.</p>
+          <div className={styles.topicGrid}>
+            {TOPIC_PREVIEWS.map(t => (
+              <Link key={t.id} to={`/${t.id}`} className={styles.topicCard}>
+                <div className={styles.topicCardTop}>
+                  <span className={styles.topicCardIcon}>{t.icon}</span>
+                  <span className={styles.topicCardTag}>{t.tag}</span>
+                </div>
+                <div className={styles.topicCardLabel}>{t.label}</div>
+                <div className={styles.topicCardFooter}>
+                  <span className={styles.topicCardCount}>{t.count} concepts</span>
+                  <span className={styles.topicCardArrow}>→</span>
+                </div>
+              </Link>
+            ))}
+          </div>
+          <div className={styles.topicSeeAll}>
+            <Link to="/js-core" className={styles.topicSeeAllLink}>
+              View all 30+ topics →
             </Link>
-          ))}
-        </div>
-        <div className={styles.topicSeeAll}>
-          <Link to="/js-core" className={styles.topicSeeAllLink}>
-            View all 30+ topics →
-          </Link>
-        </div>
-      </section>
+          </div>
+        </section>
 
-      {/* ── CTA ────────────────────────────────────────────────────── */}
-      <section className={styles.ctaSection}>
-        <h2 className={styles.ctaTitle}>Ready to level up?</h2>
-        <p className={styles.ctaSub}>
-          Create a free account to track your progress, earn streaks,
-          and get a personalised learning plan built around your timeline.
-        </p>
-        <div className={styles.heroActions}>
-          <Link to="/register" className={styles.heroCta}>Create free account →</Link>
-          <button className={styles.heroExplore} onClick={() => navigate('/js-core')}>
-            Browse without signing up
-          </button>
-        </div>
-      </section>
+        {/* ── CTA ────────────────────────────────────────────────────── */}
+        <section className={styles.ctaSection}>
+          <h2 className={styles.ctaTitle}>Ready to level up?</h2>
+          <p className={styles.ctaSub}>
+            Create a free account to track your progress, earn streaks,
+            and get a personalised learning plan built around your timeline.
+          </p>
+          <div className={styles.heroActions}>
+            <Link to="/register" className={styles.heroCta}>Create free account →</Link>
+            <button className={styles.heroExplore} onClick={() => navigate('/js-core')}>
+              Browse without signing up
+            </button>
+          </div>
+        </section>
       </main>
 
       {/* ── Footer ─────────────────────────────────────────────────── */}

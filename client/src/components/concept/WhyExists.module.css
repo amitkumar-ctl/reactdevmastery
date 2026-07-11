@@ -14,7 +14,7 @@
 }
 .emptyIcon { font-size: 32px; margin-bottom: 10px; }
 .emptyTitle { font-size: 14px; font-weight: 700; color: #e2e8f0; margin-bottom: 6px; }
-.emptySub { font-size: 12px; color: #6b7280; line-height: 1.6; }
+.emptySub { font-size: 14px; color: #6b7280; line-height: 1.6; }
 
 /* ── Section card ────────────────────────────────────────── */
 .section {
@@ -76,7 +76,7 @@
 }
 
 .code {
-  font-size: 12px;
+  font-size: 14px;
   color: #e2e8f0;
   line-height: 1.7;
   padding: 14px;

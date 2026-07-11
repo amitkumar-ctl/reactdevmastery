@@ -23,7 +23,7 @@
 }
 
 .welcomeSub {
-  font-size: 12px;
+  font-size: 14px;
   color: #9ca3af;
   margin-top: 2px;
 }
@@ -197,7 +197,7 @@
 }
 
 .roadmapLabel {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
   transition: color 0.15s;
 }
@@ -249,7 +249,7 @@
 .quickBtn {
   padding: 10px;
   border-radius: 8px;
-  font-size: 12px;
+  font-size: 14px;
   font-family: inherit;
   cursor: pointer;
   border: 1px solid;

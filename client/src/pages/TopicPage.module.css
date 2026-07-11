@@ -2,7 +2,7 @@
 
 .topbar { padding: 14px 24px; border-bottom: 1px solid #1e2d40; background: #060910; flex-shrink: 0; }
 
-.backBtn { background: none; border: none; color: #9ca3af; font-family: inherit; font-size: 12px; cursor: pointer; margin-bottom: 8px; display: block; transition: color 0.15s; }
+.backBtn { background: none; border: none; color: #9ca3af; font-family: inherit; font-size: 14px; cursor: pointer; margin-bottom: 8px; display: block; transition: color 0.15s; }
 .backBtn:hover { color: #00ff88; }
 
 .topicTitle { font-size: 20px; font-weight: 700; color: #e2e8f0; margin-bottom: 6px; }
@@ -30,7 +30,7 @@
 
 .cardTitle { font-size: 14px; font-weight: 700; color: #e2e8f0; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .doneBadge { font-size: 10px; color: #00ff88; background: #052210; border: 1px solid #0a4420; padding: 1px 7px; border-radius: 8px; }
-.cardDesc { font-size: 12px; color: #9ca3af; line-height: 1.6; margin-bottom: 12px; }
+.cardDesc { font-size: 14px; color: #9ca3af; line-height: 1.6; margin-bottom: 12px; }
 .cardFooter { display: flex; align-items: center; justify-content: space-between; }
 .diffEasy { font-size: 10px; color: #00ff88; }
 .diffMedium { font-size: 10px; color: #eab308; }
@@ -40,7 +40,7 @@
 
 /* Tab bar */
 .tabBar { display: flex; gap: 2px; padding: 0 24px; border-bottom: 1px solid #1e2d40; background: #060910; flex-shrink: 0; }
-.tabBtn { padding: 10px 16px; font-size: 12px; color: #9ca3af; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all 0.15s; font-family: inherit; background: none; border-top: none; border-left: none; border-right: none; }
+.tabBtn { padding: 10px 16px; font-size: 14px; color: #9ca3af; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all 0.15s; font-family: inherit; background: none; border-top: none; border-left: none; border-right: none; }
 .tabBtn:hover:not(.tabActive) { color: #e2e8f0; }
 .tabActive { color: #00ff88; border-bottom-color: #00ff88; }
 
@@ -51,7 +51,7 @@
 .explainBox { font-size: 13px; color: #e2e8f0; line-height: 1.8; white-space: pre-wrap; font-family: inherit; margin: 0; background: #0a0e1a; border: 1px solid #1e2d40; border-radius: 8px; padding: 14px; }
 .muted { color: #9ca3af; font-size: 13px; }
 
-.codeBlock { background: #060910; border: 1px solid #1e2d40; border-radius: 8px; padding: 16px; font-size: 12px; color: #e2e8f0; overflow-x: auto; position: relative; }
+.codeBlock { background: #060910; border: 1px solid #1e2d40; border-radius: 8px; padding: 16px; font-size: 14px; color: #e2e8f0; overflow-x: auto; position: relative; }
 .codeLang { position: absolute; top: 8px; right: 12px; font-size: 9px; color: #6b7280; letter-spacing: 1px; }
 .codeBlock pre { margin: 0; white-space: pre-wrap; }
 
@@ -97,7 +97,7 @@
 .btn { padding: 6px 14px; border-radius: 6px; font-size: 11px; font-family: inherit; cursor: pointer; border: 1px solid #2a3f5f; background: transparent; color: #4facfe; font-weight: 600; transition: all 0.15s; }
 .btn:hover:not(:disabled) { background: #0d1829; }
 .btn:disabled { opacity: 0.4; cursor: not-allowed; }
-.btnPrimary { padding: 8px 16px; border-radius: 6px; font-size: 12px; font-family: inherit; cursor: pointer; border: none; background: linear-gradient(135deg, #00c853, #00897b); color: #001a0a; font-weight: 700; transition: all 0.15s; }
+.btnPrimary { padding: 8px 16px; border-radius: 6px; font-size: 14px; font-family: inherit; cursor: pointer; border: none; background: linear-gradient(135deg, #00c853, #00897b); color: #001a0a; font-weight: 700; transition: all 0.15s; }
 .btnPrimary:hover:not(:disabled) { opacity: 0.9; }
 .btnPrimary:disabled { opacity: 0.5; cursor: not-allowed; }
 

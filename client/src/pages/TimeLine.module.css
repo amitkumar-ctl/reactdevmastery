@@ -142,7 +142,7 @@
 }
 
 .cardSub {
-  font-size: 12px;
+  font-size: 14px;
   color: #9ca3af;
   line-height: 1.5;
 }
@@ -169,7 +169,7 @@
 }
 
 .expandText {
-  font-size: 12px;
+  font-size: 14px;
   color: #c5cdd8;
   line-height: 1.8;
   margin: 0;
@@ -182,7 +182,7 @@
 }
 
 .chip {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
   padding: 5px 12px;
   border-radius: 20px;

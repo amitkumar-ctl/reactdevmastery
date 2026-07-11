@@ -7,7 +7,7 @@
 }
 
 .title {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 700;
   color: #9ca3af;
   text-transform: uppercase;
@@ -37,7 +37,7 @@
 }
 
 .sectionTitle {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
   color: #e2e8f0;
 }
@@ -63,7 +63,7 @@
   border: 1px solid #1e2d40;
   border-radius: 20px;
   cursor: pointer;
-  font-size: 12px;
+  font-size: 14px;
   color: #e2e8f0;
   transition: border-color 0.15s, background 0.15s;
   text-align: left;

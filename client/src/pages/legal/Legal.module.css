@@ -45,7 +45,7 @@
 }
 
 .backLink {
-  font-size: 12px;
+  font-size: 14px;
   color: #9ca3af;
   text-decoration: none;
   border: 1px solid #1e2d40;
@@ -89,7 +89,7 @@
 }
 
 .updated {
-  font-size: 12px;
+  font-size: 14px;
   color: #6b7280;
   margin-bottom: 36px;
   padding-bottom: 24px;
@@ -205,7 +205,7 @@
   justify-content: center;
   padding: 20px 24px;
   border-top: 1px solid #1e2d40;
-  font-size: 12px;
+  font-size: 14px;
 }
 
 .footer a {

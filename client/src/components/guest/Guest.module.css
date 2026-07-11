@@ -12,7 +12,7 @@
 }
 
 .bannerText {
-  font-size: 12px;
+  font-size: 14px;
   color: #9ca3af;
 }
 
@@ -23,7 +23,7 @@
 }
 
 .bannerSignup {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 700;
   color: #00ff88;
   text-decoration: none;
@@ -37,7 +37,7 @@
 .bannerSignup:hover { background: #00ff8820; border-color: #00ff88; }
 
 .bannerLogin {
-  font-size: 12px;
+  font-size: 14px;
   color: #9ca3af;
   text-decoration: none;
   transition: color 0.15s;
@@ -65,7 +65,7 @@
   border: 1px solid #2a3f5f;
   background: transparent;
   color: #9ca3af;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.15s;
@@ -162,7 +162,7 @@
   background: #111827;
   border: 1px solid #1e2d40;
   border-radius: 8px;
-  font-size: 12px;
+  font-size: 14px;
   color: #c5cdd8;
   text-align: left;
 }
@@ -188,7 +188,7 @@
 .promptSignup:hover { opacity: 0.9; transform: translateY(-1px); }
 
 .promptLogin {
-  font-size: 12px;
+  font-size: 14px;
   color: #9ca3af;
   text-decoration: none;
   transition: color 0.15s;

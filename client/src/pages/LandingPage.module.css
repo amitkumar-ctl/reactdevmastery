@@ -41,7 +41,7 @@
 }
 
 .headerLogoText {
-  font-size: 13px;
+  font-size: 1.2rem;
   font-weight: 700;
   color: #00ff88;
   letter-spacing: 0.5px;
@@ -74,7 +74,7 @@
   background: transparent;
   color: #9ca3af;
   font-family: inherit;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   text-decoration: none;
@@ -90,7 +90,7 @@
   background: linear-gradient(135deg, #00c853, #00897b);
   color: #001a0a;
   font-family: inherit;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 700;
   cursor: pointer;
   text-decoration: none;
@@ -112,7 +112,7 @@
 }
 
 .heroBadge {
-  font-size: 10px;
+  font-size: 14px;
   font-weight: 700;
   letter-spacing: 2px;
   color: #4facfe;
@@ -187,37 +187,58 @@
 .heroExplore:hover { border-color: #4facfe; color: #4facfe; }
 
 /* ── Stats bar ─────────────────────────────────────────────────────── */
-.statsBar {
-  display: flex;
-  justify-content: center;
-  gap: 0;
-  border-top: 1px solid #1e2d40;
-  border-bottom: 1px solid #1e2d40;
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  padding: 32px 0;
+}
+
+.statCard {
   background: #0d1829;
+  border: 1px solid #1e2d40;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  position: relative;
+  overflow: hidden;
+  animation: slideUp 0.6s ease-out both;
+  transition: border-color 0.2s;
+}
+.statCard:hover { border-color: #2a3f5f; }
+.statCard::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--accent);
+  animation: barFill 1.2s ease-out both;
+}
+.statTop { display: flex; align-items: center; justify-content: space-between; }
+.statIcon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+.statTag { font-size: 11px; padding: 2px 8px; border-radius: 20px; display: flex; align-items: center; gap: 4px; }
+.statNum { font-size: 32px; font-weight: 700; line-height: 1; }
+.statLabel { font-size: 13px; font-weight: 600; color: #e2e8f0; }
+.statSub { font-size: 11px; color: #6b7280; }
+.pulseDot { width: 6px; height: 6px; border-radius: 50%; animation: pulse 1.5s ease-in-out infinite; }
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes barFill {
+  from { transform: scaleX(0); transform-origin: left; }
+  to { transform: scaleX(1); transform-origin: left; }
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
 }
 
-.stat {
-  flex: 1;
-  max-width: 200px;
-  padding: 24px 16px;
-  text-align: center;
-  border-right: 1px solid #1e2d40;
-}
-
-.stat:last-child { border-right: none; }
-
-.statNum {
-  font-size: 28px;
-  font-weight: 700;
-  color: #00ff88;
-  margin-bottom: 4px;
-}
-
-.statLabel {
-  font-size: 10px;
-  color: #9ca3af;
-  letter-spacing: 1px;
-  text-transform: uppercase;
+@media (max-width: 640px) {
+  .statsGrid { grid-template-columns: repeat(2, 1fr); }
 }
 
 /* ── Features ──────────────────────────────────────────────────────── */
@@ -269,7 +290,7 @@
 }
 
 .featureSub {
-  font-size: 12px;
+  font-size: 14px;
   color: #9ca3af;
   line-height: 1.7;
 }
@@ -347,7 +368,7 @@
   font-weight: 700;
   letter-spacing: 1px;
   text-transform: uppercase;
-  color: #6b7280;
+  color: #98a3bb;
   background: #1e2d40;
   padding: 2px 7px;
   border-radius: 20px;
@@ -369,7 +390,7 @@
 
 .topicCardCount {
   font-size: 11px;
-  color: #6b7280;
+  color: #838c9f;
 }
 
 .topicCardArrow {
@@ -435,7 +456,7 @@
   align-items: center;
   padding: 20px 24px;
   border-top: 1px solid #1e2d40;
-  font-size: 11px;
+  font-size: 14px;
   color: #6b7280;
   flex-wrap: wrap;
 }
@@ -455,7 +476,7 @@
   .stat:last-child { border-bottom: none; }
   .featureGrid { grid-template-columns: 1fr; }
   .topicGrid { grid-template-columns: repeat(2, 1fr); }
-  .sectionSub { margin-top: -16px; font-size: 12px; }
+  .sectionSub { margin-top: -16px; font-size: 14px; }
   .ctaSection { padding: 32px 20px; }
   .ctaTitle { font-size: 20px; }
   .features, .topics { padding-left: 16px; padding-right: 16px; }

@@ -85,15 +85,17 @@ const TIMELINE = [
     ],
   },
   {
-    year: '2020',
-    title: 'React 17',
-    subtitle: 'No new features — just infrastructure',
-    color: '#6b7280',
-    category: 'REACT',
-    what: 'React 17 was unusual — it had no new developer-facing features. Instead it focused on making React upgrades easier and changing how React attaches events (from document to root), enabling gradual upgrades of large apps.',
-    impact: 'Laid the groundwork for Concurrent Mode. Teams could now run multiple React versions on the same page during migration.',
-    concepts: [
-      { id: 'render-cycle', topicId: 'react-core', label: 'Render Cycle' },
+  year: '2020',
+  title: 'React 17 + Recoil',
+  subtitle: 'Infrastructure update & atomic state management',
+  color: '#a855f7',
+  category: 'REACT',
+  what: 'Two significant releases in 2020. React 17 (October) had no new developer-facing features — it focused on making React upgrades easier by changing how events attach (from document to root), enabling gradual migration of large apps. Recoil (May, React Europe) was open-sourced by Facebook to solve cross-tree state sharing without Context\'s re-render problem or Redux\'s boilerplate.',
+  impact: 'React 17 laid the infrastructure for Concurrent Mode and enabled multiple React versions on the same page. Recoil introduced the atomic state model — small independent units of state where only subscribed components re-render. It influenced Jotai, Zustand\'s atom-based APIs, and shifted how the community thought about granular state management.',
+  concepts: [
+    { id: 'recoil-atoms', topicId: 'state-mgmt', label: 'Recoil — Atomic State' },
+    { id: 'render-cycle', topicId: 'react-core', label: 'Render Cycle' },
+    { id: 'suspense-pattern', topicId: 'react-patterns', label: 'Suspense' },
     ],
   },
   {

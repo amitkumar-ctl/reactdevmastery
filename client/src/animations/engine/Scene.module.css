@@ -1,0 +1,149 @@
+.wrap {
+  background: #0a0e1a;
+  border: 1px solid #1e2d40;
+  border-radius: 12px;
+  padding: 16px;
+  font-family: 'Fira Code', var(--font-mono, monospace);
+  max-width: 100%;
+  overflow: hidden;
+  position: relative;
+}
+.wrap::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  opacity: 0.7;
+}
+
+.head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+.badge {
+  font-size: 9px; font-weight: 800; letter-spacing: 1.5px;
+  color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  padding: 3px 8px; border-radius: 20px;
+}
+.title { font-size: 13px; font-weight: 700; color: #e2e8f0; letter-spacing: 0.3px; }
+
+/* code panel */
+.code {
+  background: #060910; border: 1px solid #1e2d40; border-radius: 8px;
+  padding: 8px 0; margin: 0 0 12px; font-size: 12px; line-height: 1.7;
+  color: #cbd5e1; overflow-x: auto; white-space: pre;
+}
+.codeLine { padding: 0 12px; transition: background 0.3s, color 0.3s; border-left: 2px solid transparent; }
+.codeHi {
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  border-left-color: var(--accent);
+  color: #fff;
+}
+.lineNo { display: inline-block; width: 22px; color: #3b4a60; user-select: none; }
+
+/* canvas */
+.viewport { width: 100%; overflow-x: auto; overflow-y: hidden; outline: none; border-radius: 8px; }
+.viewport:focus-visible { box-shadow: 0 0 0 2px var(--accent); }
+.canvas {
+  position: absolute; left: 0; top: 0; transform-origin: 0 0;
+  background:
+    radial-gradient(circle at 1px 1px, #16213366 1px, transparent 0) 0 0 / 20px 20px,
+    #070b15;
+  border-radius: 8px;
+}
+
+.zone {
+  position: absolute;
+  border: 1.5px solid color-mix(in srgb, var(--zc) 55%, transparent);
+  background: color-mix(in srgb, var(--zc) 7%, #0b1120);
+  transition: left 0.6s ease, top 0.6s ease, width 0.6s ease, height 0.6s ease,
+    border-color 0.35s, box-shadow 0.35s, opacity 0.45s, background 0.35s;
+}
+.zoneDashed { border-style: dashed; }
+.zoneGhost { background: transparent; }
+.zoneHi {
+  border-color: var(--zc);
+  box-shadow: 0 0 0 1px var(--zc), 0 0 22px color-mix(in srgb, var(--zc) 45%, transparent);
+  background: color-mix(in srgb, var(--zc) 14%, #0b1120);
+}
+.zoneLabel {
+  position: absolute; left: 10px; top: 6px;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.9px; text-transform: uppercase;
+  color: var(--zc); white-space: nowrap; max-width: calc(100% - 16px); overflow: hidden; text-overflow: ellipsis;
+}
+.zoneText {
+  position: absolute; inset: 22px 8px 6px; display: flex; align-items: center; justify-content: center;
+  text-align: center; font-size: 12px; color: #e2e8f0; white-space: pre-line; line-height: 1.45;
+  animation: pop 0.45s ease;
+}
+.zoneTextFull { inset: 4px 6px; font-weight: 600; }
+.zoneBig { font-size: 20px; font-weight: 800; color: var(--zc); }
+
+.svg { position: absolute; left: 0; top: 0; pointer-events: none; overflow: visible; z-index: 1; }
+.arrowG { animation: fadeIn 0.4s ease both; }
+.flow { stroke-dasharray: 6 5; animation: dash 0.9s linear infinite; }
+.arrowLabel { font-family: 'Fira Code', monospace; font-weight: 700; paint-order: stroke; stroke: #070b15; stroke-width: 4px; }
+
+.actor {
+  position: absolute; left: 0; top: 0;
+  display: flex; align-items: center; justify-content: center; text-align: center;
+  padding: 0 6px; border-radius: 7px; line-height: 1.2;
+  color: #f1f5f9; font-weight: 600; white-space: pre-line; overflow: hidden;
+  border: 1.5px solid var(--c);
+  background: color-mix(in srgb, var(--c) 22%, #0b1120);
+  box-shadow: 0 2px 10px #0007;
+  transition: transform 0.75s cubic-bezier(0.65, 0, 0.35, 1), opacity 0.45s ease,
+    width 0.75s ease, height 0.5s ease, background 0.35s, border-color 0.35s, box-shadow 0.35s;
+  will-change: transform;
+}
+.shape_dot { border-radius: 50%; padding: 0; }
+.shape_pill { border-radius: 999px; }
+.shape_box { border-radius: 10px; font-weight: 500; }
+.shape_bar { border-radius: 4px; justify-content: flex-start; padding-left: 8px; }
+.shape_ghost { background: transparent; border-style: dashed; box-shadow: none; color: #9ca3af; }
+.shape_ring { background: transparent; border: 3px solid var(--c); box-shadow: 0 0 14px var(--c); }
+.shape_text { background: transparent; border-color: transparent; box-shadow: none; color: var(--c); }
+.glow {
+  background: color-mix(in srgb, var(--c) 45%, #0b1120);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--c) 50%, transparent), 0 0 20px var(--c);
+}
+.strike { opacity: 0.5 !important; text-decoration: line-through; filter: grayscale(0.7); }
+.shake { animation: shake 0.5s ease 0.6s 2; }
+.actorBadge {
+  position: absolute; right: -2px; top: -2px; font-size: 9px; padding: 0 4px; border-radius: 6px;
+  background: var(--c); color: #04101f; font-weight: 800;
+}
+
+.caption {
+  display: flex; gap: 10px; align-items: flex-start; margin-top: 12px;
+  background: #0d1829; border: 1px solid color-mix(in srgb, var(--tone) 35%, #1e2d40);
+  border-left: 3px solid var(--tone); border-radius: 8px; padding: 10px 12px;
+  font-size: 13px; line-height: 1.55; color: #e2e8f0; min-height: 44px;
+  animation: slideUp 0.4s ease;
+  font-family: var(--font-sans, system-ui);
+}
+.stepNo { color: var(--tone); font-family: 'Fira Code', monospace; font-size: 11px; font-weight: 800; padding-top: 2px; flex-shrink: 0; }
+
+.controls { display: flex; align-items: center; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+.btn {
+  padding: 6px 12px; border-radius: 7px; font-size: 11px; font-family: 'Fira Code', monospace;
+  cursor: pointer; border: 1px solid #2a3f5f; background: transparent; color: #9ca3af; font-weight: 700;
+  transition: all 0.15s;
+}
+.btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+.btn:disabled { opacity: 0.35; cursor: default; }
+.play { border-color: var(--accent); color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, transparent); min-width: 92px; }
+.dots { display: flex; gap: 5px; flex: 1; justify-content: center; flex-wrap: wrap; min-width: 80px; }
+.dot { width: 8px; height: 8px; border-radius: 50%; border: none; background: #1e2d40; cursor: pointer; padding: 0; transition: all 0.25s; }
+.dotDone { background: color-mix(in srgb, var(--accent) 45%, #1e2d40); }
+.dotOn { background: var(--accent); width: 20px; border-radius: 4px; }
+
+@keyframes dash { to { stroke-dashoffset: -22; } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes pop { from { opacity: 0; transform: scale(0.92); } to { opacity: 1; transform: scale(1); } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes shake { 0%, 100% { margin-left: 0; } 25% { margin-left: -4px; } 75% { margin-left: 4px; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .actor, .zone { transition-duration: 0.01s; }
+  .flow, .shake { animation: none; }
+}

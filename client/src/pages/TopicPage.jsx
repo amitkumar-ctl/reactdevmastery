@@ -5,6 +5,8 @@ import { useProgress } from '../context/ProgressContext';
 import { CONCEPTS, QUIZZES, CONTENT, CHALLENGES, FAQS } from 'reactdevmastery-content/data';
 import { LEARN_COMPONENTS, VISUALIZERS } from 'reactdevmastery-content/components';
 import ConceptConnections from '../components/concept/ConceptConnections';
+import ConceptAnimation from '../animations/ConceptAnimation';
+import { VISUALIZER_ALIASES } from '../animations/aliases';
 import styles from './TopicPage.module.css';
 import SignupPrompt from '../components/guest/SignupPrompt';
 
@@ -136,7 +138,7 @@ export const ConceptPage = () => {
 
 
 const LearnTab = ({ item, topicId }) => {
-  const VisComponent = VISUALIZERS[item.id];
+  const VisComponent = VISUALIZERS[item.id] || VISUALIZERS[VISUALIZER_ALIASES[item.id]];
   const LearnComponent = LEARN_COMPONENTS[item.id];
   const content = CONTENT[item.id];
   const faqs = FAQS[item.id];
@@ -160,6 +162,8 @@ const LearnTab = ({ item, topicId }) => {
 
   return (
     <div className={styles.lessonWrap}>
+
+      <ConceptAnimation conceptId={item.id} />
 
       {VisComponent && <VisComponent />}
 
@@ -572,4 +576,4 @@ const Skeleton = () => (
     <div className={styles.skeletonLine} style={{ width: '85%' }} />
     <div className={styles.skeletonLine} style={{ width: '60%' }} />
   </div>
-);
+);

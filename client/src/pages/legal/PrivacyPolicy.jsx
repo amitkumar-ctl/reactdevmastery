@@ -4,7 +4,7 @@ import styles from './Legal.module.css';
 
 const PrivacyPolicy = () => {
   return (
-    <LegalLayout eyebrow="Legal" title="Privacy Policy" updated="June 21, 2026">
+    <LegalLayout eyebrow="Legal" title="Privacy Policy" updated="October 3, 2026">
       <p className={styles.intro}>
         This policy explains what information ReactDevMastery collects when you use the platform,
         why we collect it, and the choices you have. We built this product to teach senior frontend
@@ -35,7 +35,9 @@ const PrivacyPolicy = () => {
         </table>
         <p className={styles.text}>
           We do not collect payment information, since the platform does not currently process
-          payments. We do not use third-party advertising or analytics trackers.
+          payments. We do not use advertising trackers. We use Cloudflare Web Analytics to count
+          page views; it does not use cookies, does not track you across sites, and does not
+          collect personal information.
         </p>
       </div>
 

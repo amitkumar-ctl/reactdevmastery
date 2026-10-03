@@ -67,6 +67,7 @@
   color: #e2e8f0;
   transition: border-color 0.15s, background 0.15s;
   text-align: left;
+  text-decoration: none;
 }
 
 .chip:hover {

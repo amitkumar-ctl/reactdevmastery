@@ -23,9 +23,14 @@ const BASE_URL = 'https://reactdevmastery.com';
 // ── Read base index.html ───────────────────────────────────────────────
 const baseHtml = fs.readFileSync(path.join(BUILD_DIR, 'index.html'), 'utf-8');
 
+const escapeAttr = (str) => String(str)
+  .replace(/&/g, '&amp;').replace(/"/g, '&quot;')
+  .replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
 function injectMeta(html, { title, description, url }) {
-  const fullTitle = `${title} | ReactDevMastery`;
-  const ogImage = `${BASE_URL}/logo192.png`;
+  const fullTitle = escapeAttr(`${title} | ReactDevMastery`);
+  description = escapeAttr(description);
+  const ogImage = `${BASE_URL}/logo512.png`;
 
   const metaTags = `
     <title>${fullTitle}</title>
@@ -40,10 +45,13 @@ function injectMeta(html, { title, description, url }) {
     <meta name="twitter:title" content="${fullTitle}" />
     <meta name="twitter:description" content="${description}" />`;
 
-  // Replace default title and description with page-specific ones
+  // Strip the homepage's title/description/canonical/social tags, then add page-specific ones
   return html
     .replace(/<title>.*?<\/title>/, '')
     .replace(/<meta name="description"[^>]*>/, '')
+    .replace(/<link rel="canonical"[^>]*>/, '')
+    .replace(/<meta property="og:(title|description|url|image|type)"[^>]*>/g, '')
+    .replace(/<meta name="twitter:[^"]*"[^>]*>/g, '')
     .replace('</head>', `${metaTags}\n  </head>`);
 }
 
@@ -78,7 +86,7 @@ Object.entries(CONCEPTS).forEach(([topicId, topic]) => {
 });
 
 // ── Generate sitemap.xml ──────────────────────────────────────────────
-const staticPages = ['/', '/login', '/register', '/leaderboard', '/privacy', '/terms'];
+const staticPages = ['/', '/timeline', '/leaderboard', '/privacy', '/terms'];
 const allUrls = [
   ...staticPages.map(p => ({ url: `${BASE_URL}${p}`, priority: p === '/' ? '1.0' : '0.5', freq: 'monthly' })),
   ...Object.keys(CONCEPTS).map(id => ({ url: `${BASE_URL}/${id}`, priority: '0.8', freq: 'weekly' })),

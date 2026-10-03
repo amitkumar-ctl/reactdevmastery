@@ -1,5 +1,6 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { CONCEPTS } from 'reactdevmastery-content/data';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -85,6 +86,30 @@ const PublicRoute = ({ children }) => {
   return children;
 };
 
+// ── Per-route document title (matches scripts/generate-seo.js) ─────────
+const STATIC_TITLES = {
+  login: 'Log in', register: 'Sign up', 'forgot-password': 'Forgot password',
+  'reset-password': 'Reset password', privacy: 'Privacy Policy', terms: 'Terms of Service',
+  flashcards: 'Flash Cards', profile: 'Profile', quiz: 'Quiz',
+  leaderboard: 'Leaderboard', daily: 'Daily Challenge', timeline: 'React History',
+};
+const DEFAULT_TITLE = 'ReactDevMastery — Free Senior Frontend Interview Prep';
+
+const RouteTitle = () => {
+  const { pathname } = useLocation();
+  React.useEffect(() => {
+    const [first, second] = pathname.split('/').filter(Boolean);
+    const topic = CONCEPTS[first];
+    const item = topic && second && topic.items.find(i => i.id === second);
+    let title = null;
+    if (item) title = `${item.title} — ${topic.title}`;
+    else if (topic) title = `${topic.title} — ${topic.items.length} Concepts`;
+    else if (STATIC_TITLES[first]) title = STATIC_TITLES[first];
+    document.title = title ? `${title} | ReactDevMastery` : DEFAULT_TITLE;
+  }, [pathname]);
+  return null;
+};
+
 const SearchProvider = ({ children }) => {
   const [searchOpen, setSearchOpen] = React.useState(false);
   React.useEffect(() => {
@@ -110,6 +135,7 @@ const App = () => (
     <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID || 'placeholder'}>
       <AuthProvider>
         <BrowserRouter>
+          <RouteTitle />
           <SearchProvider>
             <Toaster
               position="bottom-right"

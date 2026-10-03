@@ -191,6 +191,7 @@
   cursor: pointer;
   font-family: inherit;
   transition: opacity 0.15s;
+  text-decoration: none;
 }
 
 .chip:hover { opacity: 0.8; }

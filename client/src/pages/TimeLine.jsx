@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import styles from './TimeLine.module.css';
 
 const TIMELINE = [
@@ -142,7 +142,6 @@ const TIMELINE = [
 
 export default function Timeline() {
   const [active, setActive] = useState(null);
-  const navigate = useNavigate();
 
   const handleClick = (idx) => {
     setActive(active === idx ? null : idx);
@@ -216,14 +215,15 @@ export default function Timeline() {
                         <div className={styles.expandLabel}>📖 Related Concepts</div>
                         <div className={styles.chips}>
                           {event.concepts.map(c => (
-                            <button
+                            <Link
                               key={c.id}
                               className={styles.chip}
                               style={{ borderColor: event.color + '40', color: event.color }}
-                              onClick={(e) => { e.stopPropagation(); navigate(`/${c.topicId}/${c.id}`); }}
+                              to={`/${c.topicId}/${c.id}`}
+                              onClick={(e) => e.stopPropagation()}
                             >
                               {c.label} →
-                            </button>
+                            </Link>
                           ))}
                         </div>
                       </div>

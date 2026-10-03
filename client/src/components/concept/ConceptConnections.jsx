@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { CONCEPTS } from 'reactdevmastery-content/data';
 import { getConnections, resolveConcept } from '../../data/conceptConnections';
 import styles from './ConceptConnections.module.css';
@@ -7,23 +7,22 @@ import styles from './ConceptConnections.module.css';
 const diffColor = { hard: '#ef4444', medium: '#f97316', easy: '#00ff88' };
 
 function ConceptChip({ conceptId, completedConcepts = [] }) {
-  const navigate = useNavigate();
   const concept = resolveConcept(conceptId, CONCEPTS);
   if (!concept) return null;
 
   const done = completedConcepts.includes(conceptId);
 
   return (
-    <button
+    <Link
       className={styles.chip}
       style={{ borderColor: done ? concept.color + '60' : '#1e2d40' }}
-      onClick={() => navigate(`/${concept.topicId}/${conceptId}`)}
+      to={`/${concept.topicId}/${conceptId}`}
     >
       <span className={styles.chipDot} style={{ background: diffColor[concept.diff] ?? '#00ff88' }} />
       <span className={styles.chipTitle}>{concept.title}</span>
       {done && <span className={styles.chipDone}>✓</span>}
       <span className={styles.chipTopic} style={{ color: concept.color }}>{concept.topicTitle}</span>
-    </button>
+    </Link>
   );
 }
 

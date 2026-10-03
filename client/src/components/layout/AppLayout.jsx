@@ -174,13 +174,13 @@ const AppLayout = ({ children }) => {
         </div>
 
         {/* Timeline entry */}
-        <div
+        <Link
+          to="/timeline"
           className={`${styles.navItem} ${currentPath === 'timeline' ? styles.navItemActive : ''}`}
-          onClick={() => navigate('/timeline')}
         >
           <span className={styles.navIcon}>📅</span>
           <span className={styles.navLabel}>React History</span>
-        </div>
+        </Link>
 
         {/* Nav */}
         <nav className={styles.nav}>
@@ -197,9 +197,10 @@ const AppLayout = ({ children }) => {
               return (
                 <React.Fragment key={t.id}>
                   {sectionEl}
-                  <div
+                  <Link
+                    to={href}
                     className={`${styles.navItem} ${active ? styles.active : ''} ${locked ? styles.navLocked : ''}`}
-                    onClick={() => handleNavClick(t.id, href)}
+                    onClick={(e) => { if (locked) { e.preventDefault(); handleNavClick(t.id, href); } }}
                     title={locked ? 'Sign up to access' : undefined}
                   >
                     <span className={styles.navIcon}>{t.icon}</span>
@@ -212,7 +213,7 @@ const AppLayout = ({ children }) => {
                           ? <span className={`${styles.navBadge} ${styles[t.badge?.toLowerCase?.() === 'new' ? 'badgeNew' : 'badgeHot']}`}>{t.badge}</span>
                           : null
                     }
-                  </div>
+                  </Link>
                 </React.Fragment>
               );
             });

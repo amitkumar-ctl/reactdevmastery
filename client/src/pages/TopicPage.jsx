@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useProgress } from '../context/ProgressContext';
 import { CONCEPTS, QUIZZES, CONTENT, CHALLENGES, FAQS } from 'reactdevmastery-content/data';
@@ -14,7 +14,6 @@ import SignupPrompt from '../components/guest/SignupPrompt';
 export const TopicPage = () => {
   const { topicId } = useParams();
   const { completedConcepts, completedTopics } = useProgress();
-  const navigate = useNavigate();
   const topic = CONCEPTS[topicId];
 
   if (!topic) return (
@@ -40,9 +39,9 @@ export const TopicPage = () => {
           {topic.items.map(item => {
             const done = completedConcepts.includes(item.id);
             return (
-              <div key={item.id} className={styles.conceptCard}
+              <Link key={item.id} className={styles.conceptCard}
                 style={{ '--accent': topic.color }}
-                onClick={() => navigate(`/${topicId}/${item.id}`)}>
+                to={`/${topicId}/${item.id}`}>
                 <div className={styles.cardTitle}>
                   {item.title}
                   {done && <span className={styles.doneBadge}>✓ done</span>}
@@ -54,7 +53,7 @@ export const TopicPage = () => {
                   </span>
                   <span className={styles.cardArrow}>→</span>
                 </div>
-              </div>
+              </Link>
             );
           })}
         </div>
@@ -66,7 +65,6 @@ export const TopicPage = () => {
 // ── Concept detail ─────────────────────────────────────────────────────
 export const ConceptPage = () => {
   const { topicId, conceptId } = useParams();
-  const navigate = useNavigate();
   const { user } = useAuth();
   const { completedConcepts, markConceptDone, recordQuiz } = useProgress();
   const [tab, setTab] = useState('learn');
@@ -84,7 +82,7 @@ export const ConceptPage = () => {
   return (
     <div className={styles.page}>
       <div className={styles.topbar}>
-        <button className={styles.backBtn} onClick={() => navigate(`/${topicId}`)}>← {topic.title}</button>
+        <Link className={styles.backBtn} to={`/${topicId}`}>← {topic.title}</Link>
         <div className={styles.conceptHeader}>
           <div className={styles.topicTitle}>{item.title}</div>
           <div className={styles.topicMeta}>

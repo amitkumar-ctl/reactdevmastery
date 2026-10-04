@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import { CONCEPTS } from 'reactdevmastery-content/data';
+import { CONCEPTS, ARCHITECT_BY_ID } from 'reactdevmastery-content/data';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -13,7 +13,7 @@ import FlashCards from './pages/FlashCards';
 import Leaderboard from './pages/Leaderboard';
 import Profile from './pages/Profile';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
-import ResetPasswordPage  from './pages/ResetPasswordPage';
+import ResetPasswordPage from './pages/ResetPasswordPage';
 import QuizPage from './pages/QuizPage';
 import DailyChallenge from './pages/DailyChallenge';
 import PrivacyPolicy from './pages/legal/PrivacyPolicy';
@@ -22,6 +22,7 @@ import GuestBanner from './components/guest/GuestBanner';
 import LandingPage from './pages/LandingPage';
 import Search from './components/search/Search';
 import TimeLine from './pages/TimeLine';
+import { ArchitectList, ArchitectCase } from './pages/architect/ArchitectPages';
 import logoMaster from './assets/logo-master.svg';
 
 // ── Loading screen ─────────────────────────────────────────────────────
@@ -102,7 +103,10 @@ const RouteTitle = () => {
     const topic = CONCEPTS[first];
     const item = topic && second && topic.items.find(i => i.id === second);
     let title = null;
-    if (item) title = `${item.title} — ${topic.title}`;
+    if (first === 'architect') {
+      const cs = second && ARCHITECT_BY_ID[second];
+      title = cs ? `${cs.title} — Frontend System Design` : 'Frontend System Design Interview Case Studies';
+    } else if (item) title = `${item.title} — ${topic.title}`;
     else if (topic) title = `${topic.title} — ${topic.items.length} Concepts`;
     else if (STATIC_TITLES[first]) title = STATIC_TITLES[first];
     document.title = title ? `${title} | ReactDevMastery` : DEFAULT_TITLE;
@@ -132,51 +136,53 @@ const SearchProvider = ({ children }) => {
 
 // ── App ────────────────────────────────────────────────────────────────
 const App = () => (
-    <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID || 'placeholder'}>
-      <AuthProvider>
-        <BrowserRouter>
-          <RouteTitle />
-          <SearchProvider>
-            <Toaster
-              position="bottom-right"
-              toastOptions={{
-                style: {
-                  background: '#111827', color: '#e2e8f0',
-                  border: '1px solid #1e2d40',
-                  fontFamily: 'Fira Code, monospace', fontSize: '13px',
-                },
-                success: { iconTheme: { primary: '#00ff88', secondary: '#111827' } },
-                error:   { iconTheme: { primary: '#ef4444', secondary: '#111827' } },
-              }}
-            />
+  <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID || 'placeholder'}>
+    <AuthProvider>
+      <BrowserRouter>
+        <RouteTitle />
+        <SearchProvider>
+          <Toaster
+            position="bottom-right"
+            toastOptions={{
+              style: {
+                background: '#111827', color: '#e2e8f0',
+                border: '1px solid #1e2d40',
+                fontFamily: 'Fira Code, monospace', fontSize: '13px',
+              },
+              success: { iconTheme: { primary: '#00ff88', secondary: '#111827' } },
+              error: { iconTheme: { primary: '#ef4444', secondary: '#111827' } },
+            }}
+          />
 
-            <Routes>
-              <Route path="/forgot-password"       element={<PublicRoute><ForgotPasswordPage /></PublicRoute>} />
-              <Route path="/reset-password/:token" element={<PublicRoute><ResetPasswordPage /></PublicRoute>} />
-              <Route path="/login"                 element={<PublicRoute><LoginPage /></PublicRoute>} />
-              <Route path="/register"              element={<PublicRoute><RegisterPage /></PublicRoute>} />
+          <Routes>
+            <Route path="/forgot-password" element={<PublicRoute><ForgotPasswordPage /></PublicRoute>} />
+            <Route path="/reset-password/:token" element={<PublicRoute><ResetPasswordPage /></PublicRoute>} />
+            <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
+            <Route path="/register" element={<PublicRoute><RegisterPage /></PublicRoute>} />
 
-              <Route path="/privacy" element={<PrivacyPolicy />} />
-              <Route path="/terms"   element={<TermsOfService />} />
+            <Route path="/privacy" element={<PrivacyPolicy />} />
+            <Route path="/terms" element={<TermsOfService />} />
 
-              <Route path="/" element={<RootRoute />} />
+            <Route path="/" element={<RootRoute />} />
 
-              <Route path="/flashcards" element={<PrivateRoute><FlashCards /></PrivateRoute>} />
-              <Route path="/profile"    element={<PrivateRoute><Profile /></PrivateRoute>} />
-              <Route path="/quiz"       element={<PrivateRoute><QuizPage /></PrivateRoute>} />
+            <Route path="/flashcards" element={<PrivateRoute><FlashCards /></PrivateRoute>} />
+            <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
+            <Route path="/quiz" element={<PrivateRoute><QuizPage /></PrivateRoute>} />
 
-              <Route path="/leaderboard"         element={<GuestRoute><Leaderboard /></GuestRoute>} />
-              <Route path="/daily"               element={<GuestRoute><DailyChallenge /></GuestRoute>} />
-              <Route path="/:topicId"            element={<GuestRoute><TopicPage /></GuestRoute>} />
-              <Route path="/:topicId/:conceptId" element={<GuestRoute><ConceptPage /></GuestRoute>} />
-              <Route path="/timeline" element={<GuestRoute><TimeLine /></GuestRoute>} />
+            <Route path="/leaderboard" element={<GuestRoute><Leaderboard /></GuestRoute>} />
+            <Route path="/daily" element={<GuestRoute><DailyChallenge /></GuestRoute>} />
+            <Route path="/architect"           element={<GuestRoute><ArchitectList /></GuestRoute>} />
+            <Route path="/architect/:caseId"   element={<GuestRoute><ArchitectCase /></GuestRoute>} />
+            <Route path="/:topicId" element={<GuestRoute><TopicPage /></GuestRoute>} />
+            <Route path="/:topicId/:conceptId" element={<GuestRoute><ConceptPage /></GuestRoute>} />
+            <Route path="/timeline" element={<GuestRoute><TimeLine /></GuestRoute>} />
 
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </SearchProvider>
-        </BrowserRouter>
-      </AuthProvider>
-    </GoogleOAuthProvider>
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </SearchProvider>
+      </BrowserRouter>
+    </AuthProvider>
+  </GoogleOAuthProvider>
 );
 
 export default App;

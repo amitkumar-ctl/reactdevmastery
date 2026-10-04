@@ -15,8 +15,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { CONCEPTS, FAQS } = require('reactdevmastery-content/data');
-
+const { CONCEPTS, FAQS, ARCHITECT_CASES = [] } = require('reactdevmastery-content/data');
 const BUILD_DIR = path.join(__dirname, '..', 'build');
 const BASE_URL = 'https://reactdevmastery.com';
 
@@ -85,11 +84,31 @@ Object.entries(CONCEPTS).forEach(([topicId, topic]) => {
   });
 });
 
+// ── Generate Architect (frontend system design) pages ─────────────────
+if (ARCHITECT_CASES.length) {
+  writeRoute('architect', {
+    title: 'Frontend System Design Interview — Case Studies',
+    description: `Frontend system design interview prep: ${ARCHITECT_CASES.length} case studies (news feed, autocomplete, chat…) using the RADIO framework, with animated architecture diagrams and React trade-offs.`,
+    url: `${BASE_URL}/architect`,
+  });
+  count++;
+  ARCHITECT_CASES.forEach(c => {
+    writeRoute(`architect/${c.id}`, {
+      title: `${c.title} — Frontend System Design`,
+      description: `${c.title} (${c.subtitle}): a complete frontend system design interview answer covering requirements, architecture, data model, API and optimizations.`,
+      url: `${BASE_URL}/architect/${c.id}`,
+    });
+    count++;
+  });
+}
+
 // ── Generate sitemap.xml ──────────────────────────────────────────────
 const staticPages = ['/', '/timeline', '/leaderboard', '/privacy', '/terms'];
 const allUrls = [
   ...staticPages.map(p => ({ url: `${BASE_URL}${p}`, priority: p === '/' ? '1.0' : '0.5', freq: 'monthly' })),
   ...Object.keys(CONCEPTS).map(id => ({ url: `${BASE_URL}/${id}`, priority: '0.8', freq: 'weekly' })),
+    ...(ARCHITECT_CASES.length ? [{ url: `${BASE_URL}/architect`, priority: '0.9', freq: 'weekly' }] : []),
+  ...ARCHITECT_CASES.map(c => ({ url: `${BASE_URL}/architect/${c.id}`, priority: '0.9', freq: 'weekly' })),
   ...Object.entries(CONCEPTS).flatMap(([topicId, topic]) =>
     topic.items.map(item => ({ url: `${BASE_URL}/${topicId}/${item.id}`, priority: '0.9', freq: 'weekly' }))
   ),

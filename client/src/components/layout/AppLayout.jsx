@@ -182,6 +182,16 @@ const AppLayout = ({ children }) => {
           <span className={styles.navLabel}>React History</span>
         </Link>
 
+        {/* Architect entry */}
+        <Link
+          to="/architect"
+          className={`${styles.navItem} ${currentPath === 'architect' ? styles.navItemActive : ''}`}
+        >
+          <span className={styles.navIcon}>🏛</span>
+          <span className={styles.navLabel}>Architect</span>
+          <span className={`${styles.navBadge} ${styles.badgeNew}`}>NEW</span>
+        </Link>
+
         {/* Nav */}
         <nav className={styles.nav}>
           {(() => {

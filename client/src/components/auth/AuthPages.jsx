@@ -1,14 +1,16 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { GoogleLogin } from '@react-oauth/google';
 import toast from 'react-hot-toast';
 import { useAuth } from '../../context/AuthContext';
 import styles from './Auth.module.css';
+import { getNextPath, withNext } from '../../utils/nextPath';
 import logoIcon from '../../assets/icon-transparent-white.svg';
 
 export const LoginPage = () => {
   const { login, googleLogin } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const nextPath = getNextPath(location.search);
   const [form, setForm] = useState({ email: '', password: '' });
   const [loading, setLoading] = useState(false);
   const [showPass, setShowPass] = useState(false);
@@ -20,7 +22,7 @@ export const LoginPage = () => {
     try {
       await login(form.email, form.password);
       toast.success('Welcome back! 🎉');
-      navigate('/');
+      navigate(nextPath, { replace: true });
     } catch (err) {
       toast.error(err.response?.data?.message || 'Login failed');
     } finally {
@@ -32,7 +34,7 @@ export const LoginPage = () => {
     try {
       await googleLogin(credential);
       toast.success('Welcome! 🎉');
-      navigate('/');
+      navigate(nextPath, { replace: true });
     } catch (err) {
       toast.error(err.response?.data?.message || 'Google login failed');
     }
@@ -112,7 +114,7 @@ export const LoginPage = () => {
         </form>
 
         <p className={styles.switchLink}>
-          Don't have an account? <Link to="/register">Create one →</Link>
+          Don't have an account? <Link to={withNext('/register', nextPath)}>Create one →</Link>
         </p>
       </div>
 
@@ -126,6 +128,8 @@ export const LoginPage = () => {
 export const RegisterPage = () => {
   const { register, googleLogin } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const nextPath = getNextPath(location.search);
   const [form, setForm] = useState({ name: '', email: '', password: '', confirm: '' });
   const [loading, setLoading] = useState(false);
   const [showPass, setShowPass] = useState(false);
@@ -139,7 +143,7 @@ export const RegisterPage = () => {
     try {
       await register(form.name, form.email, form.password);
       toast.success('Account created! Welcome 🚀');
-      navigate('/');
+      navigate(nextPath, { replace: true });
     } catch (err) {
       toast.error(err.response?.data?.message || 'Registration failed');
     } finally {
@@ -151,7 +155,7 @@ export const RegisterPage = () => {
     try {
       await googleLogin(credential);
       toast.success('Welcome to ReactDevMastery! 🚀');
-      navigate('/');
+      navigate(nextPath, { replace: true });
     } catch (err) {
       toast.error(err.response?.data?.message || 'Google sign-up failed');
     }
@@ -268,7 +272,7 @@ export const RegisterPage = () => {
         </p>
 
         <p className={styles.switchLink}>
-          Already have an account? <Link to="/login">Sign in →</Link>
+          Already have an account? <Link to={withNext('/login', nextPath)}>Sign in →</Link>
         </p>
       </div>
 

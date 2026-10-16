@@ -1,9 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useLocation, useParams } from 'react-router-dom';
 import {
   ARCHITECT_CASES, ARCHITECT_BY_ID, ARCHITECT_FRAMEWORK, ARCHITECT_UPCOMING,
 } from 'reactdevmastery-content/data';
 import Scene from '../../animations/engine/Scene';
+import { useAuth } from '../../context/AuthContext';
+import { withNext } from '../../utils/nextPath';
 import s from './Architect.module.css';
 
 const STEP_COLORS = {
@@ -17,8 +19,30 @@ const EXTRA_STEPS = [
 
 const diffClass = (d) => (d === 'hard' ? s.chipHard : d === 'medium' ? s.chipMedium : s.chipEasy);
 
+// Guests can read the first few case studies; the rest need a free account.
+export const GUEST_FREE_CASES = 3;
+const isLockedFor = (user, caseId) => !user && ARCHITECT_CASES.findIndex((c) => c.id === caseId) >= GUEST_FREE_CASES;
+
+const UnlockBanner = ({ count, next }) => (
+  <div className={s.unlock}>
+    <div className={s.unlockIcon}>🔒</div>
+    <div className={s.unlockText}>
+      <div className={s.unlockTitle}>Log in to unlock {count} more case studies</div>
+      <div className={s.unlockSub}>Free account · Video streaming, e-commerce checkout, collaborative editor, design systems and more.</div>
+    </div>
+    <div className={s.unlockActions}>
+      <Link to={withNext('/register', next)} className={s.unlockPrimary}>Sign up free</Link>
+      <Link to={withNext('/login', next)} className={s.unlockSecondary}>Log in</Link>
+    </div>
+  </div>
+);
+
 // ── /architect ─────────────────────────────────────────────────────────
-export const ArchitectList = () => (
+export const ArchitectList = () => {
+  const { user } = useAuth();
+  const freeCases = user ? ARCHITECT_CASES : ARCHITECT_CASES.slice(0, GUEST_FREE_CASES);
+  const lockedCases = user ? [] : ARCHITECT_CASES.slice(GUEST_FREE_CASES);
+  return (
   <div className={s.page}>
     <div className={s.topbar}>
       <div className={s.eyebrow}>🏛 Architect</div>
@@ -51,7 +75,7 @@ export const ArchitectList = () => (
 
         <div className={s.sectionLabel}>Case studies</div>
         <div className={s.cases}>
-          {ARCHITECT_CASES.map((c) => (
+          {freeCases.map((c) => (
             <Link key={c.id} to={`/architect/${c.id}`} className={s.caseCard}>
               <div className={s.caseSub}>{c.subtitle}</div>
               <div className={s.caseTitle}>{c.title}</div>
@@ -63,6 +87,25 @@ export const ArchitectList = () => (
             </Link>
           ))}
         </div>
+
+        {lockedCases.length > 0 && (
+          <>
+            <UnlockBanner count={lockedCases.length} next="/architect" />
+            <div className={s.cases}>
+              {lockedCases.map((c) => (
+                <Link key={c.id} to={withNext('/login', `/architect/${c.id}`)} className={`${s.caseCard} ${s.caseLocked}`} aria-label={`${c.title} — log in to unlock`}>
+                  <div className={s.caseSub}>{c.subtitle}</div>
+                  <div className={s.caseTitle}>{c.title}</div>
+                  <div className={s.caseDesc}>{c.summary}</div>
+                  <div className={s.caseFoot}>
+                    <span className={`${s.chip} ${diffClass(c.difficulty)}`}>{c.difficulty.toUpperCase()}</span>
+                    <span className={s.lockTag}>🔒 Log in to unlock</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </>
+        )}
 
         {ARCHITECT_UPCOMING.length > 0 && (
           <>
@@ -80,7 +123,8 @@ export const ArchitectList = () => (
       </div>
     </div>
   </div>
-);
+  );
+};
 
 // ── small building blocks ──────────────────────────────────────────────
 const SectionHead = ({ letter, title, time, color }) => (
@@ -133,6 +177,9 @@ const Rubric = ({ items, caseId }) => {
 export const ArchitectCase = () => {
   const { caseId } = useParams();
   const c = ARCHITECT_BY_ID[caseId];
+  const { user } = useAuth();
+  const location = useLocation();
+  const locked = isLockedFor(user, caseId);
   const contentRef = useRef(null);
   const [active, setActive] = useState('requirements');
 
@@ -159,6 +206,45 @@ export const ArchitectCase = () => {
     );
   }
 
+  if (locked) {
+    return (
+      <div className={s.page}>
+        <div className={s.topbar}>
+          <Link to="/architect" className={s.back}>← Architect</Link>
+          <div className={s.eyebrow}>{c.subtitle}</div>
+          <h1 className={s.title}>{c.title}</h1>
+          <div className={s.meta}>
+            <span className={`${s.chip} ${diffClass(c.difficulty)}`}>{c.difficulty.toUpperCase()}</span>
+            <span className={s.chip}>⏱ {c.duration}</span>
+            {c.tags.map((t) => <span key={t} className={s.chip}>{t}</span>)}
+          </div>
+        </div>
+        <div className={s.content}>
+          <div className={s.wrap}>
+            <div className={s.prompt}>
+              <div className={s.promptLabel}>🎤 The interviewer says</div>
+              <p className={s.promptText}>{c.prompt}</p>
+            </div>
+            <p className={s.intro}>{c.summary}</p>
+            <div className={s.lockedPreview} aria-hidden="true">
+              {ARCHITECT_FRAMEWORK.map((f) => (
+                <div key={f.key} className={s.lockedRow} style={{ '--c': STEP_COLORS[f.key] }}>
+                  <span className={s.radioLetter}>{f.letter}</span>
+                  <span>{f.title}</span>
+                  <span className={s.lockedBar} />
+                </div>
+              ))}
+            </div>
+            <UnlockBanner count={ARCHITECT_CASES.length - GUEST_FREE_CASES} next={location.pathname} />
+            <div className={s.nextCase}>
+              <Link to="/architect" className={s.navLink}>← Free case studies</Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const fw = Object.fromEntries(ARCHITECT_FRAMEWORK.map((f) => [f.key, f]));
   const steps = [
     ...ARCHITECT_FRAMEWORK.map((f) => ({ key: f.key, letter: f.letter, title: f.title, color: STEP_COLORS[f.key] })),
@@ -168,8 +254,8 @@ export const ArchitectCase = () => {
     const el = contentRef.current?.querySelector(`[data-step="${key}"]`);
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
-  const idx = ARCHITECT_CASES.findIndex((x) => x.id === c.id);
-  const next = ARCHITECT_CASES[(idx + 1) % ARCHITECT_CASES.length];
+  const pool = user ? ARCHITECT_CASES : ARCHITECT_CASES.slice(0, GUEST_FREE_CASES);
+  const next = pool[(pool.findIndex((x) => x.id === c.id) + 1) % pool.length];
   const head = (key) => <SectionHead letter={fw[key].letter} title={fw[key].title} time={fw[key].time} color={STEP_COLORS[key]} />;
 
   return (

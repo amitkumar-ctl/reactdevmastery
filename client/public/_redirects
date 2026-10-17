@@ -1,1 +1,5 @@
-/*    /index.html   200
+# Every public route is a real pre-rendered file (scripts/generate-seo.js),
+# so there is no catch-all rewrite: unknown URLs get 404.html with a true 404
+# status instead of the homepage with 200 ("soft 404" in Search Console).
+# Only dynamic, app-only routes still need a rewrite to the SPA shell:
+/reset-password/*  /index.html  200

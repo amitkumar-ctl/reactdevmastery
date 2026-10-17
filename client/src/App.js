@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import { CONCEPTS, ARCHITECT_BY_ID } from 'reactdevmastery-content/data';
+import { CONCEPTS, ARCHITECT_CASES, ARCHITECT_BY_ID } from 'reactdevmastery-content/data';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -24,6 +24,7 @@ import Search from './components/search/Search';
 import TimeLine from './pages/TimeLine';
 import { ArchitectList, ArchitectCase } from './pages/architect/ArchitectPages';
 import { getNextPath } from './utils/nextPath';
+import { conceptTitle, topicTitle, architectHubTitle, architectCaseTitle } from './seo/titles';
 import logoMaster from './assets/logo-master.svg';
 
 // ── Loading screen ─────────────────────────────────────────────────────
@@ -107,9 +108,9 @@ const RouteTitle = () => {
     let title = null;
     if (first === 'architect') {
       const cs = second && ARCHITECT_BY_ID[second];
-      title = cs ? `${cs.title} — Frontend System Design` : 'Frontend System Design Interview Case Studies';
-    } else if (item) title = `${item.title} — ${topic.title}`;
-    else if (topic) title = `${topic.title} — ${topic.items.length} Concepts`;
+      title = cs ? architectCaseTitle(cs) : architectHubTitle(ARCHITECT_CASES.length);
+    } else if (item) title = conceptTitle(item);
+    else if (topic) title = topicTitle(topic);
     else if (STATIC_TITLES[first]) title = STATIC_TITLES[first];
     document.title = title ? `${title} | ReactDevMastery` : DEFAULT_TITLE;
   }, [pathname]);

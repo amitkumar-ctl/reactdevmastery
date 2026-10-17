@@ -23,6 +23,7 @@ import LandingPage from './pages/LandingPage';
 import Search from './components/search/Search';
 import TimeLine from './pages/TimeLine';
 import { ArchitectList, ArchitectCase } from './pages/architect/ArchitectPages';
+import { getNextPath } from './utils/nextPath';
 import logoMaster from './assets/logo-master.svg';
 
 // ── Loading screen ─────────────────────────────────────────────────────
@@ -82,8 +83,9 @@ const GuestRoute = ({ children }) => {
 
 const PublicRoute = ({ children }) => {
   const { user, loading } = useAuth();
+  const location = useLocation();
   if (loading) return <LoadingScreen />;
-  if (user) return <Navigate to="/" replace />;
+  if (user) return <Navigate to={getNextPath(location.search)} replace />;
   return children;
 };
 
@@ -171,8 +173,8 @@ const App = () => (
 
             <Route path="/leaderboard" element={<GuestRoute><Leaderboard /></GuestRoute>} />
             <Route path="/daily" element={<GuestRoute><DailyChallenge /></GuestRoute>} />
-            <Route path="/architect"           element={<GuestRoute><ArchitectList /></GuestRoute>} />
-            <Route path="/architect/:caseId"   element={<GuestRoute><ArchitectCase /></GuestRoute>} />
+            <Route path="/architect" element={<GuestRoute><ArchitectList /></GuestRoute>} />
+            <Route path="/architect/:caseId" element={<GuestRoute><ArchitectCase /></GuestRoute>} />
             <Route path="/:topicId" element={<GuestRoute><TopicPage /></GuestRoute>} />
             <Route path="/:topicId/:conceptId" element={<GuestRoute><ConceptPage /></GuestRoute>} />
             <Route path="/timeline" element={<GuestRoute><TimeLine /></GuestRoute>} />

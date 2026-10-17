@@ -47,6 +47,12 @@ const userSchema = new mongoose.Schema(
     // ── Refresh tokens (rotation) ────────────────────────
     refreshTokens: [{ type: String, select: false }],
 
+    // ── Password reset ───────────────────────────────────
+    // Must be declared here: Mongoose silently drops fields that aren't in
+    // the schema, so without these the reset token is never saved.
+    passwordResetToken: { type: String, select: false },
+    passwordResetExpires: { type: Date, select: false },
+
     // ── Learning Progress ────────────────────────────────
     completedConcepts: [progressSchema],
     completedTopics: [{ type: String }],

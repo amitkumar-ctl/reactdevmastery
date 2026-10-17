@@ -223,7 +223,7 @@ router.post('/forgot-password', authLimiter, async (req, res, next) => {
       const resend = new Resend(process.env.RESEND_API_KEY);
 
       await resend.emails.send({
-        from: 'ReactDevMastery <noreply@reactdevmastery.dev>',
+        from: 'ReactDevMastery <noreply@reactdevmastery.com>',
         to: user.email,
         subject: 'Reset your password — ReactDevMastery',
         html: `

@@ -23,6 +23,7 @@ import LandingPage from './pages/LandingPage';
 import Search from './components/search/Search';
 import TimeLine from './pages/TimeLine';
 import { ArchitectList, ArchitectCase } from './pages/architect/ArchitectPages';
+import NotFound from './pages/NotFound';
 import { getNextPath } from './utils/nextPath';
 import { conceptTitle, topicTitle, architectHubTitle, architectCaseTitle } from './seo/titles';
 import logoMaster from './assets/logo-master.svg';
@@ -180,7 +181,7 @@ const App = () => (
             <Route path="/:topicId/:conceptId" element={<GuestRoute><ConceptPage /></GuestRoute>} />
             <Route path="/timeline" element={<GuestRoute><TimeLine /></GuestRoute>} />
 
-            <Route path="*" element={<Navigate to="/" replace />} />
+            <Route path="*" element={<GuestRoute><NotFound /></GuestRoute>} />
           </Routes>
         </SearchProvider>
       </BrowserRouter>

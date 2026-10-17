@@ -9,6 +9,7 @@ import ConceptAnimation from '../animations/ConceptAnimation';
 import { VISUALIZER_ALIASES } from '../animations/aliases';
 import styles from './TopicPage.module.css';
 import SignupPrompt from '../components/guest/SignupPrompt';
+import NotFound from './NotFound';
 
 // ── Topic list ─────────────────────────────────────────────────────────
 export const TopicPage = () => {
@@ -16,11 +17,7 @@ export const TopicPage = () => {
   const { completedConcepts, completedTopics } = useProgress();
   const topic = CONCEPTS[topicId];
 
-  if (!topic) return (
-    <div className={styles.page}>
-      <div className={styles.empty}>Module coming soon. Try JS Core, React, Security, or Performance.</div>
-    </div>
-  );
+  if (!topic) return <NotFound />;
 
   return (
     <div className={styles.page}>
@@ -71,7 +68,8 @@ export const ConceptPage = () => {
   const topic = CONCEPTS[topicId];
   const item = topic?.items.find(i => i.id === conceptId);
 
-  if (!topic || !item) return <div className={styles.page}><div className={styles.empty}>Concept not found.</div></div>;
+  if (!topic) return <NotFound />;
+  if (!item) return <NotFound kind="concept" />;
 
   const isGuest = !user;
   const done = completedConcepts.includes(item.id);
@@ -574,4 +572,4 @@ const Skeleton = () => (
     <div className={styles.skeletonLine} style={{ width: '85%' }} />
     <div className={styles.skeletonLine} style={{ width: '60%' }} />
   </div>
-);
+);
